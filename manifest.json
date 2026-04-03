@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "g3-automator",
+  "version": "1.0",
+  "description": "auto filler",
+  "permissions": [
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://*.safaricom.co.ke/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://sp.ke.m-pesa.com/*"
+      ],
+      "js": [
+        "dist/content.js"
+      ],
+      "all_frames": true,
+      "type": "module"
+    }
+  ]
+}

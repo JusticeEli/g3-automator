@@ -1,0 +1,11 @@
+{
+    "name": "hlr-automator",
+    "version": "1.0.0",
+    "scripts": {
+        "build": "esbuild src/content.ts --bundle --outfile=dist/content.js --format=iife",
+        "watch": "esbuild src/content.ts --bundle --outfile=dist/content.js --format=iife --watch"
+    },
+    "devDependencies": {
+        "esbuild": "^0.20.2"
+    }
+}

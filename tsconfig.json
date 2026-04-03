@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+      "target": "ES6",          // JS version to output
+      "module": "ESNext",       // For module syntax
+      "outDir": "./dist",       // Compiled JS goes here
+      "strict": true,
+      "sourceMap": true
+    },
+    "include": ["src/**/*"]
+  }
