@@ -45,6 +45,8 @@ const setClickListenerForCustomerMsisdn = async () => {
         customerMsisdnInput.dispatchEvent(new Event("input", { bubbles: true }))
 
         clickSearchButton()
+
+        //wait for table records to change
         await waitForTableToChange()
 
         //wait for details record
