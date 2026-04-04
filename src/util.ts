@@ -45,6 +45,7 @@ const setClickListenerForCustomerMsisdn = async () => {
         customerMsisdnInput.dispatchEvent(new Event("input", { bubbles: true }))
 
         clickSearchButton()
+        await waitForTableToChange()
 
         //wait for details record
 
@@ -58,16 +59,31 @@ const setClickListenerForCustomerMsisdn = async () => {
 
 
 }
+const waitForTableToChange = (): Promise<void> => {
+    return new Promise((resolve) => {
+        const tbody = document.querySelector(".el-table__body tbody")!;
+
+
+        const observer = new MutationObserver(() => {
+            console.log("tbody changed ✅");
+            observer.disconnect();
+            resolve();
+        });
+
+        observer.observe(tbody, {
+            childList: true,  // watch for added/removed rows
+            subtree: true,    // watch all descendants
+            attributes: true, // watch attribute changes
+            characterData: true // watch text changes
+        });
+    });
+};
 
 
 const clickSearchButton = () => {
-    console.log("");
-
-
+    console.log("clickSearchButton");
     const searchButton = document.querySelector('button[class="el-button el-button--primary form-btn-margin-left-8"]') as HTMLButtonElement
     searchButton.click()
-
-
 }
 
 
