@@ -4,7 +4,9 @@
   "version": "1.0",
   "description": "auto filler",
   "permissions": [
-    "scripting"
+    "scripting",
+    "clipboardRead",
+    "clipboardWrite"
   ],
   "host_permissions": [
     "https://*.safaricom.co.ke/*"
