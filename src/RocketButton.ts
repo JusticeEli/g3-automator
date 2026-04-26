@@ -1,3 +1,4 @@
+import { test } from "./util";
 
 export const injectRocketButton = () => {
     console.log("injectRocketButton");
@@ -29,7 +30,8 @@ export const injectRocketButton = () => {
 }
 
 export const rocketButtonClicked = () => {
-console.log("rocket...");
+    console.log("rocket...");
+    test()
 
 }
 
