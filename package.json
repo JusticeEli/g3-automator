@@ -3,9 +3,11 @@
     "version": "1.0.0",
     "scripts": {
         "build": "esbuild src/content.ts --bundle --outfile=dist/content.js --format=iife",
-        "watch": "esbuild src/content.ts --bundle --outfile=dist/content.js --format=iife --watch"
+        "watch": "esbuild src/content.ts src/content-crmsaf.ts src/background.ts --bundle --outdir=dist --format=iife --watch",
+        "watch-bs": "esbuild src/background.ts --bundle --outfile=dist/background.js --format=iife --watch"
     },
     "devDependencies": {
+        "@types/chrome": "^0.1.40",
         "esbuild": "^0.20.2"
     }
 }

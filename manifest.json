@@ -3,10 +3,14 @@
   "name": "g3-automator",
   "version": "1.0",
   "description": "auto filler",
+  "background": {
+    "service_worker": "dist/background.js"
+  },
   "permissions": [
     "scripting",
     "clipboardRead",
-    "clipboardWrite"
+    "clipboardWrite",
+    "tabs"
   ],
   "host_permissions": [
     "https://*.safaricom.co.ke/*"
@@ -21,6 +25,14 @@
       ],
       "all_frames": true,
       "type": "module"
+    },
+    {
+      "matches": [
+        "https://crmsaf.safaricom.co.ke/*"
+      ],
+      "js": [
+        "dist/content-crmsaf.js"
+      ]
     }
   ]
 }

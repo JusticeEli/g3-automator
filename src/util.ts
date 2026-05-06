@@ -112,7 +112,15 @@ const clickReviewTransaction = async () => {
 }
 
 export const test = () => {
-    //  fillRelatedAccount()
+    addMerchantReversalInteraction()
+}
+
+const addMerchantReversalInteraction = async () => {
+    console.log("addMerchantReversalInteraction");
+    chrome.runtime.sendMessage({
+        type: "ADD_MERCHANT_REVERSAL_INTERACTION"
+    });
+
 }
 
 const waitForTableToChange = (): Promise<void> => {
