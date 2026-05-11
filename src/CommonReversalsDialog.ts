@@ -12,7 +12,12 @@ const configureCommonReversalDialoag = async () => {
     const div = await waitForElementToAppearForever('div[class="page-title"]') as HTMLDivElement
     const container = div.parentElement!.parentElement!
     const dialog = createCommonReversalDialog()
-    container.appendChild(dialog)
+
+    dialog.style.position = "fixed"
+    dialog.style.bottom = "60%";
+    dialog.style.right = "8%";
+    document.body.appendChild(dialog)
+
     console.log("reverse loaded");
 
 }
@@ -21,6 +26,8 @@ const createCommonReversalDialog = () => {
 
     // Wrapper
     const wrapper = document.createElement("div");
+    wrapper.style.zIndex = "999999";
+
 
     //main button
     const button = document.createElement("button");
@@ -34,7 +41,7 @@ const createCommonReversalDialog = () => {
     button.style.cursor = "pointer";
 
 
-    //dropdown
+    // Dropdown
     const dropdown = document.createElement("div");
     dropdown.style.position = "absolute";
     dropdown.style.top = "100%";
@@ -46,10 +53,7 @@ const createCommonReversalDialog = () => {
     dropdown.style.background = "white";
     button.style.border = "none"
     dropdown.style.boxShadow = "0 4px 8px rgba(0,0,0,0.15)";
-    dropdown.style.display = "display"; // hidden initially
-    dropdown.style.flexDirection = "row"
-    dropdown.style.alignItems = "center";
-    dropdown.style.gap = "8px";
+    dropdown.style.display = "none"; // hidden initially
     dropdown.style.zIndex = "1000";
     dropdown.style.whiteSpace = "nowrap"
     dropdown.style.zIndex = "999999";
@@ -62,7 +66,7 @@ const createCommonReversalDialog = () => {
         item.textContent = itemText;
         item.style.padding = "8px 12px";
         item.style.cursor = "pointer";
-        //  item.style.width = "100%"
+        item.style.width = "100%"
 
         item.onmouseenter = () => {
             item.style.background = "#f2f2f2";
