@@ -1,3 +1,5 @@
+import { DiySmsFlow } from "./DiySmsFlow";
+
 export const injectMessageListener = async () => {
     console.log("injectMessageListener");
 
@@ -23,6 +25,10 @@ export const injectMessageListener = async () => {
                 addPochiReversalInteraction()
                 break
             }
+            case "ADD_PAYBILL_REVERSAL_INTERACTION": {
+                addPaybillReversalInteraction(msg)
+                break
+            }
 
 
         }
@@ -32,7 +38,7 @@ const clickCommonStuffButton = () => {
     const commonStuffButton = document.querySelector('#commonStuffButtonId') as HTMLButtonElement
     commonStuffButton.click()
 }
-const addMerchantReversalInteraction = (txnId:string) => {
+const addMerchantReversalInteraction = (txnId: string) => {
     console.log("addMerchantReversalInteraction");
     const merchantReversalDiv = document.querySelector('#MerchantREVERSAL-commonStuffButton') as HTMLDivElement
     merchantReversalDiv.click()
@@ -53,7 +59,33 @@ const addPochiReversalInteraction = () => {
 
 
 }
+const addPaybillReversalInteraction = async (msg: { txnId: string, officePhoneNumber: string, paybillName: string }) => {
+    console.log("addPaybillReversalInteraction msg: " + msg);
 
+    const sms = `Jambo, kindly contact ${msg.paybillName}   on ${msg.officePhoneNumber} (Normal rates apply) for assistance. Thank you.`
+
+    await sendPaybillContactDetails(sms)
+
+    const comment = `${msg.txnId}
+${sms}
+    `
+    await writeContentToClipBoard(comment)
+
+    const merchantReversalDiv = document.querySelector('#PaybillREVERSAL-commonStuffButton') as HTMLDivElement
+    merchantReversalDiv.click()
+
+
+}
+export const sendPaybillContactDetails = async (sms: string) => {
+    console.log("sendPaybillContactDetails");
+
+    await new (class extends DiySmsFlow {
+        protected message =
+            sms
+    })().send();
+
+
+}
 
 export const waitForElementWithParagraphTextContentToAppear = (textContent: string, timeout = 120_000) => {
     return new Promise<Element>((resolve, reject) => {
@@ -89,4 +121,10 @@ export const waitForElementWithParagraphTextContentToAppear = (textContent: stri
     }
 
     )
+}
+
+const writeContentToClipBoard = async (content: string) => {
+    console.log("content: " + content);
+    await navigator.clipboard.writeText(content)
+
 }

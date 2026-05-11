@@ -112,9 +112,35 @@ const clickReviewTransaction = async () => {
 }
 
 export const test = () => {
-    addMerchantReversalInteraction()
+    getOfficePhoneNumber()
+
+
 }
 
+export const getOfficePhoneNumber = async () => {
+    console.log("getOfficePhoneNumber");
+
+    const officePhoneNumberTitleDiv = await waitForElementWithDivTextContentToAppear("Office Phone Number") as HTMLDivElement
+    const officePhoneNumberDiv = officePhoneNumberTitleDiv.nextElementSibling! as HTMLDivElement
+    console.log("phone number: " + officePhoneNumberDiv.textContent);
+
+    return officePhoneNumberDiv.textContent
+
+
+}
+export const getPayBillName = async () => {
+    console.log("getPayBillName");
+
+    const selector = 'div[class="page-title"]'
+    const payBillNameDiv = await waitForElementToAppearForever(selector) as HTMLDivElement
+
+
+    const payBillName = payBillNameDiv.textContent!.split("-")[1].replace("Details", "")
+
+    console.log("paybill: " + payBillName);
+    return payBillName
+
+}
 const addMerchantReversalInteraction = async () => {
     console.log("addMerchantReversalInteraction");
     chrome.runtime.sendMessage({
@@ -202,6 +228,42 @@ export const waitForElementToAppearWithTextContent = (selector: string, textCont
         });
 
         observer.observe(parent, {
+            childList: true,
+            subtree: true
+        });
+
+        // Optional: timeout safety
+        setTimeout(() => {
+            observer.disconnect();
+            reject("Element not found within timeout");
+        }, timeout);
+    }
+
+    )
+}
+
+export const waitForElementWithDivTextContentToAppear = (textContent: string, timeout = 120_000) => {
+    return new Promise<Element>((resolve, reject) => {
+
+        const element = Array.from(document.querySelectorAll("div")).find(e => e.textContent == textContent)
+
+        if (element) {
+            console.log("found:first try " + element.textContent);
+
+            return resolve(element); // already exists
+        }
+
+        const observer = new MutationObserver(() => {
+            const el = Array.from(document.querySelectorAll("div")).find(e => e.textContent == textContent)
+            if (el) {
+                console.log("found: " + el.textContent);
+
+                observer.disconnect();
+                resolve(el);
+            }
+        });
+
+        observer.observe(document.body, {
             childList: true,
             subtree: true
         });

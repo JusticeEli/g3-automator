@@ -1,4 +1,4 @@
-import { waitForElementToAppearForever } from "./util";
+import { getOfficePhoneNumber, getPayBillName, waitForElementToAppearForever } from "./util";
 import { waitForElementWithParagraphTextContentToAppear } from "./util-crmsaf";
 
 
@@ -59,7 +59,7 @@ const createCommonReversalDialog = () => {
     dropdown.style.zIndex = "999999";
 
     // Dropdown items
-    const items = ["Merchant REVERSAL", "P2P REVERSAL", "POCHI REVERSAL"]
+    const items = ["Merchant REVERSAL", "P2P REVERSAL", "POCHI REVERSAL", "PAYBILL REVERSAL"]
     items.forEach((itemText) => {
         const item = document.createElement("div");
         item.id = `${itemText}-commonStuffButton`.replace(" ", "")
@@ -120,19 +120,28 @@ const createCommonReversalDialog = () => {
 
 const specificItemClicked = async (sr: string) => {
     console.log("sr: " + sr);
-    await writeContentToClipBoard(await getTransactionId())
     switch (sr) {
 
         case "Merchant REVERSAL": {
+            await writeContentToClipBoard(await getTransactionId())
+
             initiateMerchantReversalJourney()
             break
         }
         case "P2P REVERSAL": {
+            await writeContentToClipBoard(await getTransactionId())
+
             initiateP2pReversalJourney()
             break
         }
         case "POCHI REVERSAL": {
+            await writeContentToClipBoard(await getTransactionId())
+
             initiatePochiReversalJourney()
+            break
+        }
+        case "PAYBILL REVERSAL": {
+            initiatePaybillReversalJourney()
             break
         }
     }
@@ -143,6 +152,16 @@ const initiateMerchantReversalJourney = async () => {
     chrome.runtime.sendMessage({
         type: "ADD_MERCHANT_REVERSAL_INTERACTION",
         txnId: await getTransactionId()
+    });
+
+}
+const initiatePaybillReversalJourney = async () => {
+    console.log("initiatePaybillReversalJourney");
+    chrome.runtime.sendMessage({
+        type: "ADD_PAYBILL_REVERSAL_INTERACTION",
+        txnId: await getClipBoardContent(),
+        officePhoneNumber: await getOfficePhoneNumber(),
+        paybillName: await getPayBillName()
     });
 
 }
@@ -174,5 +193,14 @@ const getTransactionId = async () => {
 const writeContentToClipBoard = async (content: string) => {
     console.log("content: " + content);
     await navigator.clipboard.writeText(content)
+
+}
+const getClipBoardContent = async () => {
+    console.log("getClipBoardContent");
+
+    const content = await navigator.clipboard.readText()
+    console.log("clipboard content: " + content);
+    return content
+
 
 }

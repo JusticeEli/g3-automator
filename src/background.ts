@@ -1,11 +1,6 @@
 
-chrome.runtime.sendMessage({
-    type: "GO_TO_CRM_TAB"
-});
-
-
-
 chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
+    console.log("msg: " + msg);
 
     const prefix = "https://crmsaf.safaricom.co.ke/siebel/";
 
@@ -19,7 +14,7 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
 
             chrome.tabs.sendMessage(existingTab.id!, {
                 type: "ADD_MERCHANT_REVERSAL_INTERACTION",
-                txnId:msg.txnId
+                txnId: msg.txnId
             });
 
             break
@@ -36,6 +31,18 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
 
             chrome.tabs.sendMessage(existingTab.id!, {
                 type: "ADD_POCHI_REVERSAL_INTERACTION"
+            });
+
+            break
+        }
+        case "ADD_PAYBILL_REVERSAL_INTERACTION": {
+
+            chrome.tabs.sendMessage(existingTab.id!, {
+                type: "ADD_PAYBILL_REVERSAL_INTERACTION",
+                txnId: msg.txnId,
+                paybillName: msg.paybillName,
+                officePhoneNumber: msg.officePhoneNumber
+
             });
 
             break
