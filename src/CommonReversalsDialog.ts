@@ -14,8 +14,8 @@ const configureCommonReversalDialoag = async () => {
     const dialog = createCommonReversalDialog()
 
     dialog.style.position = "fixed"
-    dialog.style.bottom = "60%";
-    dialog.style.right = "8%";
+    dialog.style.top = "2%";
+    dialog.style.right = "40%";
     document.body.appendChild(dialog)
 
     console.log("reverse loaded");
