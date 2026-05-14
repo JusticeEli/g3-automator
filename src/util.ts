@@ -1,3 +1,5 @@
+import { showConfirmationDialogAndWaitForAnswer } from "./ConfirmationDialog"
+
 export const injectSetListenerForGlobalElements = async () => {
 
 
@@ -7,6 +9,7 @@ export const injectSetListenerForGlobalElements = async () => {
 
 
             setClickListenerForCustomerMsisdn()
+            setClickListenerForReverseButton()
 
 
         }
@@ -28,8 +31,37 @@ const setListenersForGlobalElements = (callBack: () => void) => {
 
     )
 }
+const setClickListenerForReverseButton = async () => {
+    console.log("setClickListenerForReverseButton");
+    const selector = 'button'
+    const reverseButton = await waitForElementToAppearWithTextContentForever(selector, "Reverse") as HTMLButtonElement
+    reverseButton.onclick = () => {
+        reverseButtonClicked()
+    }
 
+}
+const reverseButtonClicked = async () => {
+    console.log("reverseButtonClicked");
+    const title = await clickMoneyRecipient()
 
+    const topOrgName = await getTopOrganizationName(title)
+
+    const orgName = await getOrganizationName()
+
+    closeActiveTab()
+
+    const message =
+        `
+    Top Organization: ${topOrgName}
+
+    Organization: ${orgName}
+    `
+    console.log("message");
+    console.log(message);
+    // await waitForDOMToSettle()
+
+    await showConfirmationDialogAndWaitForAnswer(message)
+}
 const setClickListenerForCustomerMsisdn = async () => {
     console.log("setClickListenerForCustomerMsisdn");
 
@@ -111,12 +143,70 @@ const clickReviewTransaction = async () => {
     span.click()
 }
 
-export const test = () => {
-    getOfficePhoneNumber()
+export const test = async () => {
+
+
+
 
 
 }
+const closeActiveTab = () => {
+    console.log("closeActiveTab..............");
 
+
+    const activeTab = document.querySelector(
+        ".tags-view-item.active"
+    ) as HTMLDivElement
+    const closeSpan = activeTab.querySelector('span[class="close-icon"]') as HTMLSpanElement
+    const closeLink = closeSpan.querySelector("i") as HTMLLIElement
+    closeLink.click()
+
+}
+const getTopOrganizationName = async (title: string) => {
+    console.log("getTopOrganizationName");
+    const shortCode = title.split("-")[0].trim()
+    console.log("shortcode:"+shortCode);
+    
+    await waitForElementToAppearWithTextContentForever('div',shortCode)
+    const topOrgLabelDiv = await waitForElementWithDivTextContentToAppear("Top Organization Name") as HTMLDivElement
+
+
+    const parent = topOrgLabelDiv.parentElement as HTMLDivElement
+    const topOrgDiv = parent.querySelectorAll("div")[1]
+    console.log("org name: " + topOrgDiv.textContent);
+    return topOrgDiv.textContent
+
+
+}
+const getOrganizationName = async () => {
+    console.log("getOrganizationName");
+    const topOrgLabelDiv = await waitForElementWithDivTextContentToAppear("Organization Name") as HTMLDivElement
+    const parent = topOrgLabelDiv.parentElement as HTMLDivElement
+    const topOrgDiv = parent.querySelectorAll("div")[1]
+    const orgSpan = topOrgDiv.querySelector("span")!
+    console.log("org name: " + orgSpan.textContent);
+    return orgSpan.textContent
+
+
+}
+const clickMoneyRecipient = async () => {
+    console.log("clickMoneyRecipient");
+    const accountEntriesDiv = (await waitForElementWithDivTextContentToAppear(" Account Entries") as HTMLDivElement).parentElement as HTMLDivElement
+    const entriesTable = accountEntriesDiv.querySelectorAll("table")[1]
+
+    const recipientRow = entriesTable.querySelectorAll("tr")[1] as HTMLTableRowElement
+
+    const recipientTableData = recipientRow.querySelectorAll("td")[1] as HTMLTableCellElement
+    console.log("data: " + recipientTableData.textContent);
+
+    const recipientSpan = recipientTableData.querySelector("span")!
+
+    recipientSpan.click()
+
+    return recipientTableData.textContent!
+
+
+}
 export const getOfficePhoneNumber = async () => {
     console.log("getOfficePhoneNumber");
 
@@ -241,6 +331,31 @@ export const waitForElementToAppearWithTextContent = (selector: string, textCont
 
     )
 }
+export const waitForElementToAppearWithTextContentForever = (selector: string, textContent: string, parent: Element = document.body) => {
+    return new Promise<Element>((resolve, reject) => {
+        const element = Array.from(parent.querySelectorAll(selector)).find(s => s.textContent!.trim() == textContent)
+
+        if (element) {
+            return resolve(element); // already exists
+        }
+
+        const observer = new MutationObserver(() => {
+            const el = Array.from(parent.querySelectorAll(selector)).find(s => s.textContent!.trim() == textContent)
+            if (el) {
+                observer.disconnect();
+                resolve(el);
+            }
+        });
+
+        observer.observe(parent, {
+            childList: true,
+            subtree: true
+        });
+
+    }
+
+    )
+}
 
 export const waitForElementWithDivTextContentToAppear = (textContent: string, timeout = 120_000) => {
     return new Promise<Element>((resolve, reject) => {
@@ -277,3 +392,34 @@ export const waitForElementWithDivTextContentToAppear = (textContent: string, ti
 
     )
 }
+
+const waitForDOMToSettle = (timeout = 50): Promise<void> => {
+    return new Promise((resolve) => {
+        let timer: ReturnType<typeof setTimeout>;
+
+        const observer = new MutationObserver(() => {
+            // reset timer every time DOM changes
+            clearTimeout(timer);
+
+            // resolve when DOM has been stable for 500ms
+            timer = setTimeout(() => {
+                observer.disconnect();
+                console.log("DOM settled ✅");
+                resolve();
+            }, timeout);
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            characterData: true
+        });
+
+        // safety timeout
+        setTimeout(() => {
+            observer.disconnect();
+            resolve();
+        }, 10000);
+    });
+};
