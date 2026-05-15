@@ -1,4 +1,4 @@
-import { getOfficePhoneNumber, getPayBillName, waitForElementToAppearForever } from "./util";
+import { clickKycInfoTab, clickMoneyRecipient, getOfficePhoneNumber, getPayBillName, waitForElementToAppearForever, waitForElementToAppearWithTextContentForever } from "./util";
 import { waitForElementWithParagraphTextContentToAppear } from "./util-crmsaf";
 
 
@@ -156,6 +156,38 @@ const initiateMerchantReversalJourney = async () => {
 
 }
 const initiatePaybillReversalJourney = async () => {
+    console.log("initiatePaybillReversalJourney2");
+
+    const trnId = await getTransactionId()
+
+    const title = await clickMoneyRecipient()
+
+
+    // wait for screen to load
+    const shortCode = title.split("-")[0].trim()
+    console.log("shortcode:" + shortCode);
+
+    await waitForElementToAppearWithTextContentForever('div', shortCode)
+
+    //
+
+
+    await clickKycInfoTab()
+    const officePhoneNumber = await getOfficePhoneNumber()
+    const paybillName = await getPayBillName()
+
+
+
+    ////
+    chrome.runtime.sendMessage({
+        type: "ADD_PAYBILL_REVERSAL_INTERACTION",
+        txnId: trnId,
+        officePhoneNumber: officePhoneNumber,
+        paybillName: paybillName
+    });
+
+}
+/* const initiatePaybillReversalJourney = async () => {
     console.log("initiatePaybillReversalJourney");
     chrome.runtime.sendMessage({
         type: "ADD_PAYBILL_REVERSAL_INTERACTION",
@@ -164,7 +196,7 @@ const initiatePaybillReversalJourney = async () => {
         paybillName: await getPayBillName()
     });
 
-}
+} */
 const initiateP2pReversalJourney = async () => {
     console.log("initiateP2pReversalJourney");
     chrome.runtime.sendMessage({

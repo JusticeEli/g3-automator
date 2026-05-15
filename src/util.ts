@@ -1,4 +1,5 @@
 import { showConfirmationDialogAndWaitForAnswer } from "./ConfirmationDialog"
+import { waitForElementWithParagraphTextContentToAppear } from "./util-crmsaf"
 
 export const injectSetListenerForGlobalElements = async () => {
 
@@ -40,8 +41,40 @@ const setClickListenerForReverseButton = async () => {
     }
 
 }
+const getTransactionType = async () => {
+    console.log("getTransactionType");
+    const label = await waitForElementWithParagraphTextContentToAppear("Transaction Type") as HTMLParagraphElement
+
+    const parent = label.parentElement!
+    const dataElement = parent.querySelectorAll("p")[1]
+    console.log("transaction type: " + dataElement.textContent);
+    return dataElement.textContent!
+
+}
 const reverseButtonClicked = async () => {
     console.log("reverseButtonClicked");
+
+    const transactionType = (await getTransactionType()).trim()
+    console.log("transactionType: " + transactionType);
+
+    switch (transactionType) {
+        case "Customer Merchant Payment": {
+
+            reverseForMerchant()
+            break
+        }
+        case "send": {
+
+
+            break
+        }
+    }
+
+}
+
+
+const reverseForMerchant = async () => {
+    console.log("reverseForMerchant");
     const title = await clickMoneyRecipient()
 
     const topOrgName = await getTopOrganizationName(title)
@@ -52,15 +85,46 @@ const reverseButtonClicked = async () => {
 
     const message =
         `
-    Top Organization: ${topOrgName}
+    Top Organization: 
+    
+    ${topOrgName}
 
-    Organization: ${orgName}
+    Organization: 
+
+    ${orgName}
     `
     console.log("message");
     console.log(message);
     // await waitForDOMToSettle()
 
     await showConfirmationDialogAndWaitForAnswer(message)
+}
+export const clickKycInfoTab = async () => {
+    console.log("clickKycInfoTab");
+
+    const kycTab = await waitForElementWithDivTextContentToAppear("KYC Info") as HTMLDivElement
+
+    kycTab.click()
+
+
+}
+const reverseForPaybill = async () => {
+    console.log("reverseForPaybill");
+    const title = await clickMoneyRecipient()
+
+
+    // wait for screen to load
+    const shortCode = title.split("-")[0].trim()
+    console.log("shortcode:" + shortCode);
+
+    await waitForElementToAppearWithTextContentForever('div', shortCode)
+
+    //
+
+
+    await clickKycInfoTab()
+    await getOfficePhoneNumber()
+
 }
 const setClickListenerForCustomerMsisdn = async () => {
     console.log("setClickListenerForCustomerMsisdn");
@@ -146,10 +210,11 @@ const clickReviewTransaction = async () => {
 export const test = async () => {
 
 
-
+    reverseForPaybill()
 
 
 }
+
 const closeActiveTab = () => {
     console.log("closeActiveTab..............");
 
@@ -165,9 +230,9 @@ const closeActiveTab = () => {
 const getTopOrganizationName = async (title: string) => {
     console.log("getTopOrganizationName");
     const shortCode = title.split("-")[0].trim()
-    console.log("shortcode:"+shortCode);
-    
-    await waitForElementToAppearWithTextContentForever('div',shortCode)
+    console.log("shortcode:" + shortCode);
+
+    await waitForElementToAppearWithTextContentForever('div', shortCode)
     const topOrgLabelDiv = await waitForElementWithDivTextContentToAppear("Top Organization Name") as HTMLDivElement
 
 
@@ -189,7 +254,7 @@ const getOrganizationName = async () => {
 
 
 }
-const clickMoneyRecipient = async () => {
+export const clickMoneyRecipient = async () => {
     console.log("clickMoneyRecipient");
     const accountEntriesDiv = (await waitForElementWithDivTextContentToAppear(" Account Entries") as HTMLDivElement).parentElement as HTMLDivElement
     const entriesTable = accountEntriesDiv.querySelectorAll("table")[1]
