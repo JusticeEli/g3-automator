@@ -85,11 +85,11 @@ const reverseForMerchant = async () => {
 
     const message =
         `
-    Top Organization: 
+    -----Top Organization:--- 
     
     ${topOrgName}
 
-    Organization: 
+    ----Organization:--- 
 
     ${orgName}
     `
