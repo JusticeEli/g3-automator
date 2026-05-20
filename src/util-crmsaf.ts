@@ -20,6 +20,12 @@ export const injectMessageListener = async () => {
 
                 break
             }
+            case "ADD_BANK_MERCHANT_REVERSAL_SR": {
+
+                addBankMerchantReversalSr(msg.txnId)
+
+                break
+            }
             case "ADD_P2P_REVERSAL_INTERACTION": {
 
                 addP2pReversalInteraction()
@@ -53,6 +59,13 @@ const addMerchantReversalInteraction = (txnId: string) => {
 const addSfcMerchantReversalInteraction = (txnId: string) => {
     console.log("addSfcMerchantReversalInteraction");
     const merchantReversalDiv = document.querySelector('#SfcMerchantREVERSAL-commonStuffButton') as HTMLDivElement
+    merchantReversalDiv.click()
+
+
+}
+const addBankMerchantReversalSr = (txnId: string) => {
+    console.log("addBankMerchantReversalSr");
+    const merchantReversalDiv = document.querySelector('#InitiateBankReversal-commonStuffButton') as HTMLDivElement
     merchantReversalDiv.click()
 
 

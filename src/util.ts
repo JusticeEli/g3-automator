@@ -220,7 +220,14 @@ const reverseForMerchant = async () => {
             break;
         }
         default: {
-            await showConfirmationDialogAndWaitForAnswer(message)
+
+            if (isTillBankAggregated(topOrgName)) {
+                reverseForMerchantBank(message, topOrgName)
+
+            } else {
+
+                await showMessageDialog(message)
+            }
             break
         }
     }
@@ -229,6 +236,34 @@ const reverseForMerchant = async () => {
 
 }
 
+const isTillBankAggregated = (topOrgName: string) => {
+
+    if (topOrgName.trim().toLowerCase().includes("bank")) {
+        return true
+    } else {
+        return false
+    }
+
+}
+const reverseForMerchantBank = async (message: string, topOrgName: string) => {
+    console.log("reverseForMerchantBank");
+
+    const finalMessage =
+        `${message}
+    Do you want to raise SR for this bank reversal ?
+    `
+    const send = await showConfirmationDialogAndWaitForAnswer(finalMessage, "yes")
+    if (send) {
+        raiseSrForMerchantBankReversal()
+    }
+
+
+
+}
+const raiseSrForMerchantBankReversal = () => {
+    console.log("raiseSrForMerchantBankReversal");
+    specificItemClicked("Bank Merchant REVERSAL")
+}
 const reverseForMerchantSfc = async () => {
     console.log("reverseForMerchantSfc");
     //set click listener for submit button
@@ -249,24 +284,7 @@ export const clickKycInfoTab = async () => {
 
 
 }
-const reverseForPaybill = async () => {
-    console.log("reverseForPaybill");
-    const title = await clickMoneyRecipient()
 
-
-    // wait for screen to load
-    const shortCode = title.split("-")[0].trim()
-    console.log("shortcode:" + shortCode);
-
-    await waitForElementToAppearWithTextContentForever('div', shortCode)
-
-    //
-
-
-    await clickKycInfoTab()
-    await getOfficePhoneNumber()
-
-}
 const setClickListenerForCustomerMsisdn = async () => {
     console.log("setClickListenerForCustomerMsisdn");
 

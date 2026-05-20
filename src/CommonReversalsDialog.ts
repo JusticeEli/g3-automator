@@ -127,11 +127,17 @@ export const specificItemClicked = async (sr: string) => {
 
             initiateMerchantReversalJourney()
             break
-        }   
-          case "Sfc Merchant REVERSAL": {
+        }
+        case "Sfc Merchant REVERSAL": {
             await writeContentToClipBoard(await getTransactionId())
 
             initiateSfcMerchantReversalJourney()
+            break
+        }
+        case "Bank Merchant REVERSAL": {
+            await writeContentToClipBoard(await getTransactionId())
+
+            initiateBankMerchantReversalJourney()
             break
         }
         case "P2P REVERSAL": {
@@ -165,6 +171,14 @@ const initiateSfcMerchantReversalJourney = async () => {
     console.log("initiateSfcMerchantReversalJourney");
     chrome.runtime.sendMessage({
         type: "ADD_SFC_MERCHANT_REVERSAL_INTERACTION",
+        txnId: await getTransactionId()
+    });
+
+}
+const initiateBankMerchantReversalJourney = async () => {
+    console.log("initiateBankMerchantReversalJourney");
+    chrome.runtime.sendMessage({
+        type: "ADD_BANK_MERCHANT_REVERSAL_SR",
         txnId: await getTransactionId()
     });
 
