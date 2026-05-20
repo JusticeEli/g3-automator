@@ -70,6 +70,8 @@ const reverseButtonClicked = async () => {
 
     const transactionType = (await getTransactionType()).trim()
     console.log("transactionType: " + transactionType);
+    const reasonType = (await getReasonType()).trim()
+    console.log("reasonType: " + reasonType);
 
     switch (transactionType) {
         case "Customer Merchant Payment": {
@@ -78,7 +80,7 @@ const reverseButtonClicked = async () => {
             break
         }
         case "Send Money": {
-            reverseForSendMoney()
+            reverseForSendMoney(reasonType)
 
             break
         }
@@ -90,14 +92,25 @@ const reverseButtonClicked = async () => {
     }
 
 }
-const reverseForSendMoney = async () => {
-    console.log("reverseForSendMoney");
+const reverseForSendMoney = async (reasonType: string) => {
+    console.log("reverseForSendMoney: reasonType: " + reasonType);
 
     const selector = '#submitProcessTransaction'
     const submitButton = await waitForElementToAppear(selector) as HTMLButtonElement
-    submitButton.onclick = () => {
-        submitForSendMoney()
+
+    switch (reasonType) {
+        case "Customer Transfer": {
+
+            submitButton.onclick = () => {
+                submitForSendMoney()
+            }
+
+            break
+
+        }
     }
+
+
 }
 
 
