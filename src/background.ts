@@ -19,6 +19,15 @@ chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
 
             break
         }
+        case "ADD_SFC_MERCHANT_REVERSAL_INTERACTION": {
+
+            chrome.tabs.sendMessage(existingTab.id!, {
+                type: "ADD_SFC_MERCHANT_REVERSAL_INTERACTION",
+                txnId: msg.txnId
+            });
+
+            break
+        }
         case "ADD_P2P_REVERSAL_INTERACTION": {
 
             chrome.tabs.sendMessage(existingTab.id!, {

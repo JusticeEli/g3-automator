@@ -1,4 +1,6 @@
+import { specificItemClicked } from "./CommonReversalsDialog"
 import { showConfirmationDialogAndWaitForAnswer } from "./ConfirmationDialog"
+import { waitForElementToAppear } from "./DiySmsFlow"
 import { waitForElementWithParagraphTextContentToAppear } from "./util-crmsaf"
 
 export const injectSetListenerForGlobalElements = async () => {
@@ -32,6 +34,7 @@ const setListenersForGlobalElements = (callBack: () => void) => {
 
     )
 }
+
 const setClickListenerForReverseButton = async () => {
     console.log("setClickListenerForReverseButton");
     const selector = 'button'
@@ -51,6 +54,17 @@ const getTransactionType = async () => {
     return dataElement.textContent!
 
 }
+const getReasonType = async () => {
+    console.log("getReasonType");
+    const label = await waitForElementWithParagraphTextContentToAppear("Reason Type ") as HTMLParagraphElement
+
+    const parent = label.parentElement!
+    const dataElement = parent.querySelectorAll("p")[1]
+    console.log("reason type: " + dataElement.textContent);
+    return dataElement.textContent!
+
+
+}
 const reverseButtonClicked = async () => {
     console.log("reverseButtonClicked");
 
@@ -63,6 +77,11 @@ const reverseButtonClicked = async () => {
             reverseForMerchant()
             break
         }
+        case "Send Money": {
+            reverseForSendMoney()
+
+            break
+        }
         case "send": {
 
 
@@ -71,17 +90,98 @@ const reverseButtonClicked = async () => {
     }
 
 }
+const reverseForSendMoney = async () => {
+    console.log("reverseForSendMoney");
+
+    const selector = '#submitProcessTransaction'
+    const submitButton = await waitForElementToAppear(selector) as HTMLButtonElement
+    submitButton.onclick = () => {
+        submitForSendMoney()
+    }
+}
 
 
+const submitForSendMoney = async () => {
+    console.log("submitForSendMoney");
+
+
+    //click confirm dialog
+    await dismissApprovedByAnotherOperatorDialog()
+
+    await specificItemClicked("P2P REVERSAL")
+
+
+
+
+}
+const submitForMerchantPayment = async () => {
+    console.log("submitForMerchantPayment");
+
+
+
+
+
+
+
+
+    /////////
+    const title = await clickMoneyRecipient()
+
+    const topOrgName = (await getTopOrganizationName(title))!.trim()
+
+
+    closeActiveTab()
+
+
+
+
+    switch (topOrgName) {
+        case "SFC-Lipa na Mpesa Business Till Head office 17": {
+            reverseForMerchantSfc()
+            break;
+        }
+        case "fe": {
+
+            break;
+        }
+        default: {
+            break
+        }
+    }
+
+
+
+    //click confirm dialog
+    await dismissApprovedByAnotherOperatorDialog()
+
+
+    await specificItemClicked("P2P REVERSAL")
+
+
+
+
+}
+const dismissApprovedByAnotherOperatorDialog = async () => {
+    console.log("dismissApprovedByAnotherOperatorDialog");
+
+    await waitForElementToAppearWithTextContent('p', "The request must be approved by another operator.")
+    const submitButton = await waitForElementToAppearWithTextContent('button', "Confirm") as HTMLButtonElement
+    submitButton.click()
+}
 const reverseForMerchant = async () => {
     console.log("reverseForMerchant");
     const title = await clickMoneyRecipient()
 
-    const topOrgName = await getTopOrganizationName(title)
+    const topOrgName = (await getTopOrganizationName(title))!.trim()
 
-    const orgName = await getOrganizationName()
+    const orgName = (await getOrganizationName())!.trim()
+
+
+
 
     closeActiveTab()
+
+
 
     const message =
         `
@@ -95,9 +195,37 @@ const reverseForMerchant = async () => {
     `
     console.log("message");
     console.log(message);
-    // await waitForDOMToSettle()
 
-    await showConfirmationDialogAndWaitForAnswer(message)
+
+    switch (topOrgName) {
+        case "SFC-Lipa na Mpesa Business Till Head office 17": {
+            reverseForMerchantSfc()
+            break;
+        }
+        case "fe": {
+
+            break;
+        }
+        default: {
+            await showConfirmationDialogAndWaitForAnswer(message)
+            break
+        }
+    }
+
+
+
+}
+
+const reverseForMerchantSfc = async () => {
+    console.log("reverseForMerchantSfc");
+    //set click listener for submit button
+    const selector = '#submitProcessTransaction'
+    const submitButton = await waitForElementToAppear(selector) as HTMLButtonElement
+    submitButton.onclick = async () => {
+        await dismissApprovedByAnotherOperatorDialog()
+        await specificItemClicked("Sfc Merchant REVERSAL")
+    }
+
 }
 export const clickKycInfoTab = async () => {
     console.log("clickKycInfoTab");
@@ -210,7 +338,7 @@ const clickReviewTransaction = async () => {
 export const test = async () => {
 
 
-    reverseForPaybill()
+    specificItemClicked("Sfc Merchant REVERSAL")
 
 
 }
@@ -290,8 +418,11 @@ export const getPayBillName = async () => {
     const payBillNameDiv = await waitForElementToAppearForever(selector) as HTMLDivElement
 
 
-    const payBillName = payBillNameDiv.textContent!.split("-")[1].replace("Details", "")
-
+    const payBillName = payBillNameDiv.textContent!.split("-")
+        .slice(1)        // take everything after first hyphen
+        .join("-")       // rejoin with hyphen in case there are more hyphens
+        .replace("Details", "")
+        .trim();
     console.log("paybill: " + payBillName);
     return payBillName
 

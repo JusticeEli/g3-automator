@@ -118,7 +118,7 @@ const createCommonReversalDialog = () => {
     return wrapper;
 }
 
-const specificItemClicked = async (sr: string) => {
+export const specificItemClicked = async (sr: string) => {
     console.log("sr: " + sr);
     switch (sr) {
 
@@ -126,6 +126,12 @@ const specificItemClicked = async (sr: string) => {
             await writeContentToClipBoard(await getTransactionId())
 
             initiateMerchantReversalJourney()
+            break
+        }   
+          case "Sfc Merchant REVERSAL": {
+            await writeContentToClipBoard(await getTransactionId())
+
+            initiateSfcMerchantReversalJourney()
             break
         }
         case "P2P REVERSAL": {
@@ -151,6 +157,14 @@ const initiateMerchantReversalJourney = async () => {
     console.log("initiateMerchantReversalJourney");
     chrome.runtime.sendMessage({
         type: "ADD_MERCHANT_REVERSAL_INTERACTION",
+        txnId: await getTransactionId()
+    });
+
+}
+const initiateSfcMerchantReversalJourney = async () => {
+    console.log("initiateSfcMerchantReversalJourney");
+    chrome.runtime.sendMessage({
+        type: "ADD_SFC_MERCHANT_REVERSAL_INTERACTION",
         txnId: await getTransactionId()
     });
 
