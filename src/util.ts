@@ -369,7 +369,7 @@ const clickReviewTransaction = async () => {
 export const test = async () => {
 
 
-    specificItemClicked("Sfc Merchant REVERSAL")
+    reverseForMerchantBank("bank", "hey me")
 
 
 }

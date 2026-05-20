@@ -65,7 +65,7 @@ const addSfcMerchantReversalInteraction = (txnId: string) => {
 }
 const addBankMerchantReversalSr = (txnId: string) => {
     console.log("addBankMerchantReversalSr");
-    const merchantReversalDiv = document.querySelector('#InitiateBankReversal-commonStuffButton') as HTMLDivElement
+    const merchantReversalDiv = document.querySelector('#InitiateBankReversal2-commonStuffButton') as HTMLDivElement
     merchantReversalDiv.click()
 
 
