@@ -1,6 +1,7 @@
 import { specificItemClicked } from "./CommonReversalsDialog"
 import { showConfirmationDialogAndWaitForAnswer } from "./ConfirmationDialog"
 import { waitForElementToAppear } from "./DiySmsFlow"
+import { showMessageDialog } from "./MessageDialog"
 import { waitForElementWithParagraphTextContentToAppear } from "./util-crmsaf"
 
 export const injectSetListenerForGlobalElements = async () => {
@@ -98,17 +99,19 @@ const reverseForSendMoney = async (reasonType: string) => {
     const selector = '#submitProcessTransaction'
     const submitButton = await waitForElementToAppear(selector) as HTMLButtonElement
 
-    switch (reasonType) {
-        case "Customer Transfer": {
 
-            submitButton.onclick = () => {
-                submitForSendMoney()
-            }
+    if (reasonType.startsWith("Customer Transfer")) {
+        submitButton.onclick = () => {
+            submitForSendMoney()
+        }
 
-            break
-
+    } else if (reasonType.startsWith("Customer Send to Micro SME Business")) {
+        submitButton.onclick = () => {
+            submitForSendMoneyMicroSmeBusiness()
         }
     }
+
+
 
 
 }
@@ -117,11 +120,42 @@ const reverseForSendMoney = async (reasonType: string) => {
 const submitForSendMoney = async () => {
     console.log("submitForSendMoney");
 
+    waitApprovedByAnotherOperatorDialog()
 
+
+  //  waitInsufficientFundsDialog()
+
+
+
+
+}
+
+const waitInsufficientFundsDialog = async () => {
+    console.log("waitInsufficientFundsDialog");
+    
+    //click confirm dialog
+    await dismissInsufficientFundsDialog()
+
+    
+
+}
+const waitApprovedByAnotherOperatorDialog = async () => {
+    console.log("waitApprovedByAnotherOperator");
     //click confirm dialog
     await dismissApprovedByAnotherOperatorDialog()
 
     await specificItemClicked("P2P REVERSAL")
+
+
+}
+const submitForSendMoneyMicroSmeBusiness = async () => {
+    console.log("submitForSendMoney");
+
+
+    //click confirm dialog
+    await dismissApprovedByAnotherOperatorDialog()
+
+    await specificItemClicked("POCHI REVERSAL")
 
 
 
@@ -181,6 +215,13 @@ const dismissApprovedByAnotherOperatorDialog = async () => {
     const submitButton = await waitForElementToAppearWithTextContent('button', "Confirm") as HTMLButtonElement
     submitButton.click()
 }
+const dismissInsufficientFundsDialog = async () => {
+    console.log("dismissInsufficientFundsDialog");
+
+    await waitForElementToAppearWithTextContentIncludes('p', "insufficient")
+    const submitButton = await waitForElementToAppearWithTextContent('button', "Confirm") as HTMLButtonElement
+    submitButton.click()
+}
 const reverseForMerchant = async () => {
     console.log("reverseForMerchant");
     const title = await clickMoneyRecipient()
@@ -208,6 +249,8 @@ const reverseForMerchant = async () => {
     `
     console.log("message");
     console.log(message);
+
+    // await showMessageDialog(message)
 
 
     switch (topOrgName) {
@@ -538,6 +581,38 @@ export const waitForElementToAppearWithTextContent = (selector: string, textCont
 
         const observer = new MutationObserver(() => {
             const el = Array.from(parent.querySelectorAll(selector)).find(s => s.textContent!.trim() == textContent)
+            if (el) {
+                observer.disconnect();
+                resolve(el);
+            }
+        });
+
+        observer.observe(parent, {
+            childList: true,
+            subtree: true
+        });
+
+        // Optional: timeout safety
+        setTimeout(() => {
+            observer.disconnect();
+            reject("Element not found within timeout");
+        }, timeout);
+    }
+
+    )
+}
+
+export const waitForElementToAppearWithTextContentIncludes = (selector: string, textContent: string, parent: Element = document.body, timeout = 5_000) => {
+
+    return new Promise<Element>((resolve, reject) => {
+        const element = Array.from(parent.querySelectorAll(selector)).find(s => s.textContent!.trim().toLowerCase().includes(textContent.toLowerCase()))
+
+        if (element) {
+            return resolve(element); // already exists
+        }
+
+        const observer = new MutationObserver(() => {
+            const el = Array.from(parent.querySelectorAll(selector)).find(s => s.textContent!.trim().toLowerCase().includes(textContent.toLowerCase()))
             if (el) {
                 observer.disconnect();
                 resolve(el);

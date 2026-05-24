@@ -1,4 +1,6 @@
-const showMessageDialog = (dialogDescription: string): Promise<boolean> => {
+export const showMessageDialog = (dialogDescription: string): Promise<boolean> => {
+    console.log("showMessageDialog");
+    
     return new Promise((resolve) => {
         // Overlay
         const overlay = document.createElement("div");
