@@ -13,6 +13,7 @@ export const injectSetListenerForGlobalElements = async () => {
 
 
             setClickListenerForCustomerMsisdn()
+            setClickListenerForQuickQueryCustomerMsisdn()
             setClickListenerForReverseButton()
 
 
@@ -123,7 +124,7 @@ const submitForSendMoney = async () => {
     waitApprovedByAnotherOperatorDialog()
 
 
-  //  waitInsufficientFundsDialog()
+    //  waitInsufficientFundsDialog()
 
 
 
@@ -132,11 +133,11 @@ const submitForSendMoney = async () => {
 
 const waitInsufficientFundsDialog = async () => {
     console.log("waitInsufficientFundsDialog");
-    
+
     //click confirm dialog
     await dismissInsufficientFundsDialog()
 
-    
+
 
 }
 const waitApprovedByAnotherOperatorDialog = async () => {
@@ -365,6 +366,45 @@ const setClickListenerForCustomerMsisdn = async () => {
 
 
 }
+
+
+
+const setClickListenerForQuickQueryCustomerMsisdn = async () => {
+    console.log("setClickListenerForQuickQueryCustomerMsisdn");
+
+    //wait for search input
+    const selector = 'input[placeholder="MSISDN, % is supported"][class="el-input__inner"]'
+    await waitForElementToAppearForever(selector)
+    console.log("input found");
+
+    const customerMsisdnInput = document.querySelector(selector) as HTMLInputElement;
+    customerMsisdnInput.onclick = async () => {
+        customerMsisdnInput.value = "%"
+        customerMsisdnInput.value += await getContentInClipBoard()
+        customerMsisdnInput.dispatchEvent(new Event("input", { bubbles: true }))
+
+        await clickQuickQuerySearchButton()
+
+
+
+        //wait for details record
+
+
+        const detailsButton = (await waitForElementToAppearWithTextContentIncludes('span', "Details")).parentElement as HTMLButtonElement
+
+
+        detailsButton.click()
+
+
+        await clickReviewTransaction()
+        await clickTransactionsTab()
+        await fillRelatedAccount()
+
+
+    }
+
+
+}
 const fillRelatedAccount = async () => {
     console.log("fillRelatedAccount");
 
@@ -533,6 +573,12 @@ const waitForTableToChange = (): Promise<void> => {
 const clickSearchButton = async () => {
     console.log("clickSearchButton");
     const searchButton = await waitForElementToAppearWithTextContent('button[class="el-button el-button--primary form-btn-margin-left-8"]', "Search") as HTMLButtonElement
+
+    searchButton.click()
+}
+const clickQuickQuerySearchButton = async () => {
+    console.log("clickSearchButton");
+    const searchButton = await waitForElementToAppearWithTextContent('button[class="el-button search-btn"]', "Search") as HTMLButtonElement
 
     searchButton.click()
 }
