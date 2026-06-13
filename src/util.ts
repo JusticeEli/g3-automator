@@ -14,6 +14,7 @@ export const injectSetListenerForGlobalElements = async () => {
 
             setClickListenerForCustomerMsisdn()
             setClickListenerForQuickQueryCustomerMsisdn()
+            setClickListenerForQuickQuerySearchTransaction()
             setClickListenerForReverseButton()
 
 
@@ -405,6 +406,37 @@ const setClickListenerForQuickQueryCustomerMsisdn = async () => {
 
 
 }
+const setClickListenerForQuickQuerySearchTransaction = async () => {
+    console.log("setClickListenerForQuickQuerySearchTransaction");
+
+    //wait for search input
+    const selector = 'input[placeholder="Receipt No."][class="el-input__inner"]'
+    await waitForElementToAppearForever(selector)
+    console.log("input found");
+
+    const customerMsisdnInput = document.querySelector(selector) as HTMLInputElement;
+    customerMsisdnInput.onclick = async () => {
+        customerMsisdnInput.value += await getContentInClipBoard()
+        customerMsisdnInput.dispatchEvent(new Event("input", { bubbles: true }))
+
+
+        // const searchTransactionDiv = (await waitForElementToAppearWithTextContent('div', "Search Transaction") as HTMLDivElement)!.parentElement!.parentElement as HTMLDivElement
+        const searchTransactionDiv = customerMsisdnInput.parentElement!
+            .parentElement!
+            .parentElement!
+            .parentElement!
+            .parentElement!
+            .parentElement!
+            .parentElement! as HTMLDivElement;
+
+        const searchButton = await waitForElementToAppearWithTextContent('button[class="el-button search-btn"]', "Search", searchTransactionDiv) as HTMLButtonElement
+
+        searchButton.click()
+
+    }
+
+
+}
 const fillRelatedAccount = async () => {
     console.log("fillRelatedAccount");
 
@@ -618,6 +650,8 @@ export const waitForElementToAppearForever = (selector: string) => {
 
 
 export const waitForElementToAppearWithTextContent = (selector: string, textContent: string, parent: Element = document.body, timeout = 5_000) => {
+    console.log("selector: " + selector);
+
     return new Promise<Element>((resolve, reject) => {
         const element = Array.from(parent.querySelectorAll(selector)).find(s => s.textContent!.trim() == textContent)
 
