@@ -329,16 +329,21 @@ export const clickKycInfoTab = async () => {
 
 
 }
+export const waitForCustomerMsisdnInput = async () => {
+    console.log("waitForCustomerMsisdnInput");
+    const msisdnLabel = await waitForElementToAppearWithTextContentForever("label", "MSISDN")
+    const container = msisdnLabel.parentElement
+
+    const customerMsisdnInput = await waitForElementToAppearForever('input[placeholder="Please enter"][class="el-input__inner"]')
+    return customerMsisdnInput as HTMLInputElement
+}
 
 const setClickListenerForCustomerMsisdn = async () => {
     console.log("setClickListenerForCustomerMsisdn");
 
     //wait for search input
-    const selector = 'input[placeholder="Please enter"][class="el-input__inner"]'
-    await waitForElementToAppearForever(selector)
-    console.log("input found");
 
-    const customerMsisdnInput = document.querySelector(selector) as HTMLInputElement;
+    const customerMsisdnInput = await waitForCustomerMsisdnInput()
     customerMsisdnInput.onclick = async () => {
         customerMsisdnInput.value = "%"
         customerMsisdnInput.value += await getContentInClipBoard()
