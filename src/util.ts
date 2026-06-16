@@ -105,6 +105,7 @@ const reverseForSendMoney = async (reasonType: string) => {
     if (reasonType.startsWith("Customer Transfer")) {
         submitButton.onclick = () => {
             submitForSendMoney()
+
         }
 
     } else if (reasonType.startsWith("Customer Send to Micro SME Business")) {
@@ -122,10 +123,18 @@ const reverseForSendMoney = async (reasonType: string) => {
 const submitForSendMoney = async () => {
     console.log("submitForSendMoney");
 
-    waitApprovedByAnotherOperatorDialog()
+
+    const message =
+        `
+Do you want to add Interaction ?
+`
+    const yes = await showConfirmationDialogAndWaitForAnswer(message, "yes")
+    if (yes) {
+        await dismissDialogAndAddP2pReversalInteraction()
+    }
 
 
-    //  waitInsufficientFundsDialog()
+
 
 
 
@@ -141,7 +150,7 @@ const waitInsufficientFundsDialog = async () => {
 
 
 }
-const waitApprovedByAnotherOperatorDialog = async () => {
+const dismissDialogAndAddP2pReversalInteraction = async () => {
     console.log("waitApprovedByAnotherOperator");
     //click confirm dialog
     await dismissApprovedByAnotherOperatorDialog()
@@ -150,14 +159,25 @@ const waitApprovedByAnotherOperatorDialog = async () => {
 
 
 }
-const submitForSendMoneyMicroSmeBusiness = async () => {
-    console.log("submitForSendMoney");
-
-
+const dismissDialogAndAddPochiReversalInteraction = async () => {
     //click confirm dialog
     await dismissApprovedByAnotherOperatorDialog()
 
     await specificItemClicked("POCHI REVERSAL")
+
+
+}
+const submitForSendMoneyMicroSmeBusiness = async () => {
+    console.log("submitForSendMoney");
+
+    const message =
+        `
+Do you want to add Interaction ?
+`
+    const yes = await showConfirmationDialogAndWaitForAnswer(message, "yes")
+    if (yes) {
+        await dismissDialogAndAddPochiReversalInteraction()
+    }
 
 
 
@@ -252,30 +272,23 @@ const reverseForMerchant = async () => {
     console.log("message");
     console.log(message);
 
-    // await showMessageDialog(message)
 
 
-    switch (topOrgName) {
-        case "SFC-Lipa na Mpesa Business Till Head office 17": {
-            reverseForMerchantSfc()
-            break;
+    if (topOrgName.startsWith("SFC-Lipa na Mpesa Business Till Head office")) {
+        reverseForMerchantSfc()
+
+    } else {
+
+        if (isTillBankAggregated(topOrgName)) {
+            reverseForMerchantBank(message, topOrgName)
+
+        } else {
+
+            await showMessageDialog(message)
         }
-        case "fe": {
 
-            break;
-        }
-        default: {
-
-            if (isTillBankAggregated(topOrgName)) {
-                reverseForMerchantBank(message, topOrgName)
-
-            } else {
-
-                await showMessageDialog(message)
-            }
-            break
-        }
     }
+
 
 
 
@@ -315,10 +328,34 @@ const reverseForMerchantSfc = async () => {
     const selector = '#submitProcessTransaction'
     const submitButton = await waitForElementToAppear(selector) as HTMLButtonElement
     submitButton.onclick = async () => {
-        await dismissApprovedByAnotherOperatorDialog()
-        await specificItemClicked("Sfc Merchant REVERSAL")
+
+        await submitForSfcMerchantReversal()
     }
 
+}
+const submitForSfcMerchantReversal = async () => {
+    console.log("submitForSendMoney");
+
+
+    const message =
+        `
+Do you want to add Interaction ?
+`
+    const yes = await showConfirmationDialogAndWaitForAnswer(message, "yes")
+    if (yes) {
+        await dismissDialogAndAddInteractionForSfcMerchantReversal()
+    }
+
+
+
+
+
+
+
+}
+const dismissDialogAndAddInteractionForSfcMerchantReversal = async () => {
+    await dismissApprovedByAnotherOperatorDialog()
+    await specificItemClicked("Sfc Merchant REVERSAL")
 }
 export const clickKycInfoTab = async () => {
     console.log("clickKycInfoTab");
