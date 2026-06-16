@@ -2,6 +2,7 @@ import { specificItemClicked } from "./CommonReversalsDialog"
 import { showConfirmationDialogAndWaitForAnswer } from "./ConfirmationDialog"
 import { waitForElementToAppear } from "./DiySmsFlow"
 import { showMessageDialog } from "./MessageDialog"
+import { clearCustomElements, createSendOfficeNumberButton, injectPaybillButton } from "./PaybillButton"
 import { waitForElementWithParagraphTextContentToAppear } from "./util-crmsaf"
 
 export const injectSetListenerForGlobalElements = async () => {
@@ -11,7 +12,8 @@ export const injectSetListenerForGlobalElements = async () => {
 
         () => {
 
-
+            // clearCustomElements()
+               injectPaybillButton()
             setClickListenerForCustomerMsisdn()
             setClickListenerForQuickQueryCustomerMsisdn()
             setClickListenerForQuickQuerySearchTransaction()
@@ -21,7 +23,7 @@ export const injectSetListenerForGlobalElements = async () => {
         }
     )
 }
-const setListenersForGlobalElements = (callBack: () => void) => {
+const setListenersForGlobalElements_2 = (callBack: () => void) => {
     return new Promise<Element>(() => {
         const observer = new MutationObserver(() => {
             callBack()
@@ -38,6 +40,26 @@ const setListenersForGlobalElements = (callBack: () => void) => {
     )
 }
 
+
+const setListenersForGlobalElements = (callback: () => void) => {
+    let timeout: number;
+
+    const observer = new MutationObserver(() => {
+        clearTimeout(timeout);
+
+        timeout = window.setTimeout(() => {
+            callback();
+        }, 500); // wait 500ms after mutations settle
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+    });
+
+    return observer;
+};
+
 const setClickListenerForReverseButton = async () => {
     console.log("setClickListenerForReverseButton");
     const selector = 'button'
@@ -47,7 +69,7 @@ const setClickListenerForReverseButton = async () => {
     }
 
 }
-const getTransactionType = async () => {
+export const getTransactionType = async () => {
     console.log("getTransactionType");
     const label = await waitForElementWithParagraphTextContentToAppear("Transaction Type") as HTMLParagraphElement
 
@@ -526,7 +548,7 @@ const clickReviewTransaction = async () => {
 export const test = async () => {
 
 
-    reverseForMerchantBank("bank", "hey me")
+    createSendOfficeNumberButton()
 
 
 }

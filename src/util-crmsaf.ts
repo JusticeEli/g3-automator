@@ -112,7 +112,7 @@ export const sendPaybillContactDetails = async (sms: string) => {
 
 }
 
-export const waitForElementWithParagraphTextContentToAppear = (textContent: string, timeout = 120_000) => {
+export const waitForElementWithParagraphTextContentToAppear = (textContent: string, timeout = 5_000) => {
     return new Promise<Element>((resolve, reject) => {
 
         const element = Array.from(document.querySelectorAll("p")).find(e => e.textContent == textContent)
