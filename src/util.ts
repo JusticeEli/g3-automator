@@ -1,4 +1,4 @@
-import { specificItemClicked } from "./CommonReversalsDialog"
+import { specificItemClicked, writeContentToClipBoard } from "./CommonReversalsDialog"
 import { showConfirmationDialogAndWaitForAnswer } from "./ConfirmationDialog"
 import { waitForElementToAppear } from "./DiySmsFlow"
 import { showMessageDialog } from "./MessageDialog"
@@ -13,11 +13,12 @@ export const injectSetListenerForGlobalElements = async () => {
         () => {
 
             // clearCustomElements()
-               injectPaybillButton()
+            injectPaybillButton()
             setClickListenerForCustomerMsisdn()
             setClickListenerForQuickQueryCustomerMsisdn()
             setClickListenerForQuickQuerySearchTransaction()
             setClickListenerForReverseButton()
+            setClickListenerForResetPinButton()
 
 
         }
@@ -69,6 +70,15 @@ const setClickListenerForReverseButton = async () => {
     }
 
 }
+const setClickListenerForResetPinButton = async () => {
+    console.log("setClickListenerForResetPinButton");
+    const selector = 'button'
+    const resetPinButton = await waitForElementToAppearWithTextContentForever(selector, "Reset PIN") as HTMLButtonElement
+    resetPinButton.onclick = () => {
+        resetPinButtonClicked()
+    }
+
+}
 export const getTransactionType = async () => {
     console.log("getTransactionType");
     const label = await waitForElementWithParagraphTextContentToAppear("Transaction Type") as HTMLParagraphElement
@@ -88,6 +98,26 @@ const getReasonType = async () => {
     console.log("reason type: " + dataElement.textContent);
     return dataElement.textContent!
 
+
+}
+const resetPinButtonClicked = async () => {
+    console.log("resetPinButtonClicked");
+
+    const placeHolderTextArea = await waitForElementToAppear('textarea[placeholder="Please enter"]') as HTMLTextAreaElement
+
+  
+
+    const submitButton = await waitForElementToAppearWithTextContent('button', "Submit") as HTMLButtonElement
+    submitButton.onclick = async() => {
+
+        const vettingDetails = placeHolderTextArea.value
+        console.log("vettingDetails");
+        console.log(vettingDetails);
+        await writeContentToClipBoard(vettingDetails)
+    
+
+        addPinResetInteraction()
+    }
 
 }
 const reverseButtonClicked = async () => {
@@ -641,6 +671,13 @@ const addMerchantReversalInteraction = async () => {
     console.log("addMerchantReversalInteraction");
     chrome.runtime.sendMessage({
         type: "ADD_MERCHANT_REVERSAL_INTERACTION"
+    });
+
+}
+const addPinResetInteraction = async () => {
+    console.log("addPinResetInteraction");
+    chrome.runtime.sendMessage({
+        type: "ADD_PIN_RESET_INTERACTION"
     });
 
 }

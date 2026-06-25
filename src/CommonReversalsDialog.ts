@@ -250,7 +250,7 @@ const getTransactionId = async () => {
 
 }
 
-const writeContentToClipBoard = async (content: string) => {
+export const writeContentToClipBoard = async (content: string) => {
     console.log("content: " + content);
     await navigator.clipboard.writeText(content)
 
