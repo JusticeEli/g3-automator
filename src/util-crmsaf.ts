@@ -18,6 +18,11 @@ export const injectMessageListener = async () => {
 
                 addPinResetInteraction(msg.txnId)
                 break
+            }   
+             case "ADD_PIN_UNLOCK_INTERACTION": {
+
+                addPinUnlockInteraction(msg.txnId)
+                break
             }
             case "ADD_SFC_MERCHANT_REVERSAL_INTERACTION": {
 
@@ -64,6 +69,14 @@ const addMerchantReversalInteraction = (txnId: string) => {
 const addPinResetInteraction = (txnId: string) => {
     console.log("addPinResetInteraction");
     const merchantReversalDiv = document.querySelector('#PinReset-commonStuffButton') as HTMLDivElement
+    merchantReversalDiv.click()
+
+
+}
+const addPinUnlockInteraction = (txnId: string) => {
+    console.log("addPinUnlockInteraction");
+    
+    const merchantReversalDiv = document.querySelector('#PinUnlock-commonStuffButton') as HTMLDivElement
     merchantReversalDiv.click()
 
 

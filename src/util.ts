@@ -19,6 +19,7 @@ export const injectSetListenerForGlobalElements = async () => {
             setClickListenerForQuickQuerySearchTransaction()
             setClickListenerForReverseButton()
             setClickListenerForResetPinButton()
+            setClickListenerForUnlockPinButton()
 
 
         }
@@ -79,6 +80,16 @@ const setClickListenerForResetPinButton = async () => {
     }
 
 }
+const setClickListenerForUnlockPinButton = async () => {
+    console.log("setClickListenerForUnlockPinButton");
+    const selector = 'button'
+    const resetPinButton = await waitForElementToAppearWithTextContentForever(selector, "Reset PIN") as HTMLButtonElement
+    resetPinButton.onclick = () => {
+        unlockPinButtonClicked()
+        
+    }
+
+}
 export const getTransactionType = async () => {
     console.log("getTransactionType");
     const label = await waitForElementWithParagraphTextContentToAppear("Transaction Type") as HTMLParagraphElement
@@ -117,6 +128,26 @@ const resetPinButtonClicked = async () => {
     
 
         addPinResetInteraction()
+    }
+
+}
+const unlockPinButtonClicked = async () => {
+    console.log("unlockPinButtonClicked");
+
+    const placeHolderTextArea = await waitForElementToAppear('textarea[placeholder="Please enter"]') as HTMLTextAreaElement
+
+  
+
+    const submitButton = await waitForElementToAppearWithTextContent('button', "Submit") as HTMLButtonElement
+    submitButton.onclick = async() => {
+
+        const vettingDetails = placeHolderTextArea.value
+        console.log("vettingDetails");
+        console.log(vettingDetails);
+        await writeContentToClipBoard(vettingDetails)
+    
+
+        addPinUnlockInteraction()
     }
 
 }
@@ -578,7 +609,13 @@ const clickReviewTransaction = async () => {
 export const test = async () => {
 
 
-    createSendOfficeNumberButton()
+    const vettingDetails = "testing"
+    console.log("vettingDetails");
+    console.log(vettingDetails);
+    await writeContentToClipBoard(vettingDetails)
+
+
+    addPinUnlockInteraction()
 
 
 }
@@ -678,6 +715,14 @@ const addPinResetInteraction = async () => {
     console.log("addPinResetInteraction");
     chrome.runtime.sendMessage({
         type: "ADD_PIN_RESET_INTERACTION"
+    });
+
+}
+const addPinUnlockInteraction = async () => {
+    console.log("addPinUnlockInteraction");
+    
+    chrome.runtime.sendMessage({
+        type: "ADD_PIN_UNLOCK_INTERACTION"
     });
 
 }
