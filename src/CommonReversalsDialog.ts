@@ -134,6 +134,11 @@ export const specificItemClicked = async (sr: string) => {
             initiateSfcMerchantReversalJourney()
             break
         }
+        case "KOPO KOPO": {
+
+            initiateKopoKopoMerchantReversalJourney()
+            break
+        }
         case "Bank Merchant REVERSAL": {
             await writeContentToClipBoard(await getTransactionId())
 
@@ -173,6 +178,22 @@ const initiateSfcMerchantReversalJourney = async () => {
         type: "ADD_SFC_MERCHANT_REVERSAL_INTERACTION",
         txnId: await getTransactionId()
     });
+
+}
+export const initiateKopoKopoMerchantReversalJourney = async () => {
+    console.log("initiateKopoKopoMerchantReversalJourney");
+    chrome.runtime.sendMessage(
+        "mkfdjcdchljggohdnidnfmknoanaoefd", // Extension ID
+        {
+            action: "ADD_KOPO_KOPO_MERCHANT_REVERSAL_INTERACTION",
+            subType: "Kopokopo Reversal",
+            txnId: await getTransactionId()
+        },
+        (response) => {
+            console.log(response);
+        }
+    );
+
 
 }
 const initiateBankMerchantReversalJourney = async () => {

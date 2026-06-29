@@ -1,4 +1,4 @@
-import { specificItemClicked, writeContentToClipBoard } from "./CommonReversalsDialog"
+import { initiateKopoKopoMerchantReversalJourney, specificItemClicked, writeContentToClipBoard } from "./CommonReversalsDialog"
 import { showConfirmationDialogAndWaitForAnswer } from "./ConfirmationDialog"
 import { waitForElementToAppear } from "./DiySmsFlow"
 import { showMessageDialog } from "./MessageDialog"
@@ -83,10 +83,10 @@ const setClickListenerForResetPinButton = async () => {
 const setClickListenerForUnlockPinButton = async () => {
     console.log("setClickListenerForUnlockPinButton");
     const selector = 'button'
-    const resetPinButton = await waitForElementToAppearWithTextContentForever(selector, "Reset PIN") as HTMLButtonElement
+    const resetPinButton = await waitForElementToAppearWithTextContentForever(selector, "Unlock PIN") as HTMLButtonElement
     resetPinButton.onclick = () => {
         unlockPinButtonClicked()
-        
+
     }
 
 }
@@ -116,16 +116,16 @@ const resetPinButtonClicked = async () => {
 
     const placeHolderTextArea = await waitForElementToAppear('textarea[placeholder="Please enter"]') as HTMLTextAreaElement
 
-  
+
 
     const submitButton = await waitForElementToAppearWithTextContent('button', "Submit") as HTMLButtonElement
-    submitButton.onclick = async() => {
+    submitButton.onclick = async () => {
 
         const vettingDetails = placeHolderTextArea.value
         console.log("vettingDetails");
         console.log(vettingDetails);
         await writeContentToClipBoard(vettingDetails)
-    
+
 
         addPinResetInteraction()
     }
@@ -136,16 +136,16 @@ const unlockPinButtonClicked = async () => {
 
     const placeHolderTextArea = await waitForElementToAppear('textarea[placeholder="Please enter"]') as HTMLTextAreaElement
 
-  
+
 
     const submitButton = await waitForElementToAppearWithTextContent('button', "Submit") as HTMLButtonElement
-    submitButton.onclick = async() => {
+    submitButton.onclick = async () => {
 
         const vettingDetails = placeHolderTextArea.value
         console.log("vettingDetails");
         console.log(vettingDetails);
         await writeContentToClipBoard(vettingDetails)
-    
+
 
         addPinUnlockInteraction()
     }
@@ -357,10 +357,14 @@ const reverseForMerchant = async () => {
 
 
 
-    if (topOrgName.startsWith("SFC-Lipa na Mpesa Business Till Head office")) {
+    if (topOrgName.startsWith("SFC-Lipa na Mpesa Business Till Head office") || topOrgName.startsWith("SFC-Lipa na Mpesa Head office")) {
         reverseForMerchantSfc()
 
-    } else {
+    } else if (topOrgName.startsWith("KOPO KOPO")) {
+        reverseForMerchantKopoKopo()
+
+    }
+    else {
 
         if (isTillBankAggregated(topOrgName)) {
             reverseForMerchantBank(message, topOrgName)
@@ -416,6 +420,17 @@ const reverseForMerchantSfc = async () => {
     }
 
 }
+const reverseForMerchantKopoKopo = async () => {
+    console.log("reverseForMerchantSfc");
+    //set click listener for submit button
+    const selector = '#submitProcessTransaction'
+    const submitButton = await waitForElementToAppear(selector) as HTMLButtonElement
+    submitButton.onclick = async () => {
+
+        await submitForKopoKopoMerchantReversal()
+    }
+
+}
 const submitForSfcMerchantReversal = async () => {
     console.log("submitForSendMoney");
 
@@ -429,16 +444,28 @@ Do you want to add Interaction ?
         await dismissDialogAndAddInteractionForSfcMerchantReversal()
     }
 
+}
+const submitForKopoKopoMerchantReversal = async () => {
+    console.log("submitForKopoKopoMerchantReversal");
 
 
-
-
-
+    const message =
+        `
+Do you want to add Interaction ?
+`
+    const yes = await showConfirmationDialogAndWaitForAnswer(message, "yes")
+    if (yes) {
+        await dismissDialogAndAddInteractionForKopoKopoMerchantReversal()
+    }
 
 }
 const dismissDialogAndAddInteractionForSfcMerchantReversal = async () => {
     await dismissApprovedByAnotherOperatorDialog()
     await specificItemClicked("Sfc Merchant REVERSAL")
+}
+const dismissDialogAndAddInteractionForKopoKopoMerchantReversal = async () => {
+    await dismissApprovedByAnotherOperatorDialog()
+    await specificItemClicked("KOPO KOPO")
 }
 export const clickKycInfoTab = async () => {
     console.log("clickKycInfoTab");
@@ -609,13 +636,7 @@ const clickReviewTransaction = async () => {
 export const test = async () => {
 
 
-    const vettingDetails = "testing"
-    console.log("vettingDetails");
-    console.log(vettingDetails);
-    await writeContentToClipBoard(vettingDetails)
-
-
-    addPinUnlockInteraction()
+    specificItemClicked("KOPO KOPO")
 
 
 }
@@ -720,7 +741,7 @@ const addPinResetInteraction = async () => {
 }
 const addPinUnlockInteraction = async () => {
     console.log("addPinUnlockInteraction");
-    
+
     chrome.runtime.sendMessage({
         type: "ADD_PIN_UNLOCK_INTERACTION"
     });
@@ -951,3 +972,4 @@ const waitForDOMToSettle = (timeout = 50): Promise<void> => {
         }, 10000);
     });
 };
+
