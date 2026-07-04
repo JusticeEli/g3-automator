@@ -479,9 +479,8 @@ export const clickKycInfoTab = async () => {
 export const waitForCustomerMsisdnInput = async () => {
     console.log("waitForCustomerMsisdnInput");
     const msisdnLabel = await waitForElementToAppearWithTextContentForever("label", "MSISDN")
-    const container = msisdnLabel.parentElement
-
-    const customerMsisdnInput = await waitForElementToAppearForever('input[placeholder="Please enter"][class="el-input__inner"]')
+    const container = msisdnLabel.parentElement!
+    const customerMsisdnInput = await waitForElementToAppearForever('input[placeholder="Please enter"][class="el-input__inner"]', container)
     return customerMsisdnInput as HTMLInputElement
 }
 
@@ -789,23 +788,23 @@ const getContentInClipBoard = async () => {
 
 }
 
-export const waitForElementToAppearForever = (selector: string) => {
+export const waitForElementToAppearForever = (selector: string, parent: Element = document.body,) => {
     return new Promise<Element>((resolve, reject) => {
 
-        const element = document.querySelector(selector);
+        const element = parent.querySelector(selector);
         if (element) {
             return resolve(element); // already exists
         }
 
         const observer = new MutationObserver(() => {
-            const el = document.querySelector(selector);
+            const el = parent.querySelector(selector);
             if (el) {
                 observer.disconnect();
                 resolve(el);
             }
         });
 
-        observer.observe(document.body, {
+        observer.observe(parent, {
             childList: true,
             subtree: true
         });
