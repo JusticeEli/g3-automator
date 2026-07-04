@@ -3,6 +3,7 @@
   "name": "g3-automator",
   "version": "1.0",
   "description": "auto filler",
+  "key": "eocgbhnilejehpbagkaapmhdahcapaaj",
   "background": {
     "service_worker": "dist/background.js"
   },

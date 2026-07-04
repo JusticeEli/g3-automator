@@ -1,3 +1,4 @@
+import { CRM_ID } from "./Constants";
 import { clickKycInfoTab, clickMoneyRecipient, getOfficePhoneNumber, getPayBillName, waitForElementToAppearForever, waitForElementToAppearWithTextContentForever } from "./util";
 import { waitForElementWithParagraphTextContentToAppear } from "./util-crmsaf";
 
@@ -183,7 +184,7 @@ const initiateSfcMerchantReversalJourney = async () => {
 export const initiateKopoKopoMerchantReversalJourney = async () => {
     console.log("initiateKopoKopoMerchantReversalJourney");
     chrome.runtime.sendMessage(
-        "mkfdjcdchljggohdnidnfmknoanaoefd", // Extension ID
+        CRM_ID, // Extension ID
         {
             action: "ADD_KOPO_KOPO_MERCHANT_REVERSAL_INTERACTION",
             subType: "Kopokopo Reversal",
