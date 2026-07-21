@@ -383,7 +383,15 @@ const reverseForMerchant = async () => {
 
 const isTillBankAggregated = (topOrgName: string) => {
 
-    if (topOrgName.trim().toLowerCase().includes("bank")) {
+
+    const keywords = [
+        "bank",
+        "KCB",
+        "MFB",
+
+    ];
+
+    if (keywords.some(keyword => topOrgName.toLowerCase().includes(keyword.toLowerCase()))) {
         return true
     } else {
         return false
