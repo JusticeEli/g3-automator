@@ -1,9 +1,9 @@
-import { initiateKopoKopoMerchantReversalJourney, specificItemClicked, writeContentToClipBoard } from "./CommonReversalsDialog"
+import { getTransactionId, initiateKopoKopoMerchantReversalJourney, specificItemClicked, writeContentToClipBoard } from "./CommonReversalsDialog"
 import { showConfirmationDialogAndWaitForAnswer } from "./ConfirmationDialog"
 import { waitForElementToAppear } from "./DiySmsFlow"
 import { showMessageDialog } from "./MessageDialog"
 import { clearCustomElements, createSendOfficeNumberButton, injectPaybillButton } from "./PaybillButton"
-import { waitForElementWithParagraphTextContentToAppear } from "./util-crmsaf"
+import { waitForElementWithParagraphTextContentToAppear, waitForTransactionType } from "./util-crmsaf"
 
 export const injectSetListenerForGlobalElements = async () => {
 
@@ -62,13 +62,26 @@ const setListenersForGlobalElements = (callback: () => void) => {
     return observer;
 };
 
-const setClickListenerForReverseButton = async () => {
+
+const setClickListenerForReverseButton2 = async () => {
     console.log("setClickListenerForReverseButton");
     const selector = 'button'
     const reverseButton = await waitForElementToAppearWithTextContentForever(selector, "Reverse") as HTMLButtonElement
     reverseButton.onclick = () => {
         reverseButtonClicked()
     }
+
+}
+const setClickListenerForReverseButton = async () => {
+    console.log("setClickListenerForReverseButton");
+    const selector = 'button'
+
+    const reverseButtons = await waitForElementsToAppearWithTextContentForever(selector, "Reverse") as HTMLButtonElement[]
+    reverseButtons.forEach(button => {
+        button.onclick = () => {
+            reverseButtonClicked();
+        };
+    });
 
 }
 const setClickListenerForResetPinButton = async () => {
@@ -100,6 +113,7 @@ export const getTransactionType = async () => {
     return dataElement.textContent!
 
 }
+
 const getReasonType = async () => {
     console.log("getReasonType");
     const label = await waitForElementWithParagraphTextContentToAppear("Reason Type ") as HTMLParagraphElement
@@ -152,12 +166,16 @@ const unlockPinButtonClicked = async () => {
 
 }
 const reverseButtonClicked = async () => {
-    console.log("reverseButtonClicked");
-
+    console.log("reverseButtonClicked=========================================================================222");
+    //wait for screen to load
+    await waitForTransactionType()
     const transactionType = (await getTransactionType()).trim()
     console.log("transactionType: " + transactionType);
     const reasonType = (await getReasonType()).trim()
     console.log("reasonType: " + reasonType);
+    const txnId = (await getTransactionId()).trim()
+    console.log("txnId: " + txnId);
+    sessionStorage.setItem("txnId", txnId)
 
     switch (transactionType) {
         case "Customer Merchant Payment": {
@@ -912,7 +930,40 @@ export const waitForElementToAppearWithTextContentForever = (selector: string, t
 
     )
 }
+export const waitForElementsToAppearWithTextContentForever = (
+    selector: string,
+    textContent: string,
+    parent: Element = document.body
+): Promise<Element[]> => {
 
+    return new Promise((resolve) => {
+
+        const elements = Array.from(parent.querySelectorAll(selector))
+            .filter(el => el.textContent?.trim() === textContent);
+
+        if (elements.length > 0) {
+            return resolve(elements);
+        }
+
+        const observer = new MutationObserver(() => {
+
+            const matches = Array.from(parent.querySelectorAll(selector))
+                .filter(el => el.textContent?.trim() === textContent);
+
+            if (matches.length > 0) {
+                observer.disconnect();
+                resolve(matches);
+            }
+        });
+
+        observer.observe(parent, {
+            childList: true,
+            subtree: true
+        });
+
+    });
+
+};
 export const waitForElementWithDivTextContentToAppear = (textContent: string, timeout = 120_000) => {
     return new Promise<Element>((resolve, reject) => {
 

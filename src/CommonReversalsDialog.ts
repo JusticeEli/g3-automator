@@ -124,13 +124,13 @@ export const specificItemClicked = async (sr: string) => {
     switch (sr) {
 
         case "Merchant REVERSAL": {
-            await writeContentToClipBoard(await getTransactionId())
+            await writeContentToClipBoard(sessionStorage.getItem("txnId")!)
 
             initiateMerchantReversalJourney()
             break
         }
         case "Sfc Merchant REVERSAL": {
-            await writeContentToClipBoard(await getTransactionId())
+            await writeContentToClipBoard(sessionStorage.getItem("txnId")!)
 
             initiateSfcMerchantReversalJourney()
             break
@@ -141,19 +141,19 @@ export const specificItemClicked = async (sr: string) => {
             break
         }
         case "Bank Merchant REVERSAL": {
-            await writeContentToClipBoard(await getTransactionId())
+            await writeContentToClipBoard(sessionStorage.getItem("txnId")!)
 
             initiateBankMerchantReversalJourney()
             break
         }
         case "P2P REVERSAL": {
-            await writeContentToClipBoard(await getTransactionId())
+            await writeContentToClipBoard(sessionStorage.getItem("txnId")!)
 
             initiateP2pReversalJourney()
             break
         }
         case "POCHI REVERSAL": {
-            await writeContentToClipBoard(await getTransactionId())
+            await writeContentToClipBoard(sessionStorage.getItem("txnId")!)
 
             initiatePochiReversalJourney()
             break
@@ -169,7 +169,7 @@ const initiateMerchantReversalJourney = async () => {
     console.log("initiateMerchantReversalJourney");
     chrome.runtime.sendMessage({
         type: "ADD_MERCHANT_REVERSAL_INTERACTION",
-        txnId: await getTransactionId()
+        txnId: sessionStorage.getItem("txnId")!
     });
 
 }
@@ -177,7 +177,7 @@ const initiateSfcMerchantReversalJourney = async () => {
     console.log("initiateSfcMerchantReversalJourney");
     chrome.runtime.sendMessage({
         type: "ADD_SFC_MERCHANT_REVERSAL_INTERACTION",
-        txnId: await getTransactionId()
+        txnId: sessionStorage.getItem("txnId")!
     });
 
 }
@@ -188,7 +188,7 @@ export const initiateKopoKopoMerchantReversalJourney = async () => {
         {
             action: "ADD_KOPO_KOPO_MERCHANT_REVERSAL_INTERACTION",
             subType: "Kopokopo Reversal",
-            txnId: await getTransactionId()
+            txnId: sessionStorage.getItem("txnId")!
         },
         (response) => {
             console.log(response);
@@ -201,7 +201,7 @@ const initiateBankMerchantReversalJourney = async () => {
     console.log("initiateBankMerchantReversalJourney");
     chrome.runtime.sendMessage({
         type: "ADD_BANK_MERCHANT_REVERSAL_SR",
-        txnId: await getTransactionId()
+        txnId: sessionStorage.getItem("txnId")!
     });
 
 }
@@ -262,7 +262,7 @@ const initiatePochiReversalJourney = async () => {
 
 }
 
-const getTransactionId = async () => {
+export const getTransactionId = async () => {
     console.log("getTransactionId");
     const receiptP = await waitForElementWithParagraphTextContentToAppear("Receipt No. ") as HTMLParagraphElement
     const container = receiptP.parentElement!

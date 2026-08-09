@@ -173,6 +173,53 @@ export const waitForElementWithParagraphTextContentToAppear = (textContent: stri
     )
 }
 
+export const waitForTransactionType = async () => {
+    const label = await waitForElementWithParagraphTextContentToAppear(
+        "Transaction Type"
+    ) as HTMLParagraphElement;
+
+    const parent = label.parentElement!;
+
+    return new Promise<string>((resolve) => {
+
+        const getValue = () => {
+            const dataElement = parent.querySelectorAll("p")[1];
+
+            const value = dataElement?.textContent?.trim();
+
+            if (value && value !== "-") {
+                return value;
+            }
+
+            return null;
+        };
+
+        // Check immediately
+        const value = getValue();
+
+        if (value) {
+            resolve(value);
+            return;
+        }
+
+        // Keep watching for changes
+        const observer = new MutationObserver(() => {
+            const value = getValue();
+
+            if (value) {
+                observer.disconnect();
+                resolve(value);
+            }
+        });
+
+        observer.observe(parent, {
+            childList: true,
+            subtree: true,
+            characterData: true
+        });
+    });
+};
+
 const writeContentToClipBoard = async (content: string) => {
     console.log("content: " + content);
     await navigator.clipboard.writeText(content)
