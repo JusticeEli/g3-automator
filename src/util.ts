@@ -131,10 +131,9 @@ const resetPinButtonClicked = async () => {
         const vettingDetails = placeHolderTextArea.value
         console.log("vettingDetails");
         console.log(vettingDetails);
-        await writeContentToClipBoard(vettingDetails)
 
 
-        addPinResetInteraction()
+        addPinResetInteraction(vettingDetails)
     }
 
 }
@@ -154,7 +153,7 @@ const unlockPinButtonClicked = async () => {
         await writeContentToClipBoard(vettingDetails)
 
 
-        addPinUnlockInteraction()
+        addPinUnlockInteraction(vettingDetails)
     }
 
 }
@@ -757,18 +756,18 @@ const isThisOperatorPage = () => {
 
     return false
 }
-const addPinResetInteraction = async () => {
+const addPinResetInteraction = async (comments: string) => {
     console.log("addPinResetInteraction");
 
     const isOperatorPage = isThisOperatorPage()
     if (isOperatorPage) {
-        addPinResetInteractionForTillOperator()
+        addPinResetInteractionForTillOperator(comments)
     } else {
-        addPinResetInteractionForCustomer()
+        addPinResetInteractionForCustomer(comments)
     }
 
 }
-const addPinResetInteractionForTillOperator = async () => {
+const addPinResetInteractionForTillOperator = async (comments: string) => {
     console.log("addPinResetInteractionForTillOperator");
 
 
@@ -785,21 +784,42 @@ const addPinResetInteractionForTillOperator = async () => {
 
 
 }
-const addPinResetInteractionForCustomer = async () => {
+const addPinResetInteractionForCustomer = async (comments: string) => {
     console.log("addPinResetInteractionForCustomer");
-    chrome.runtime.sendMessage({
-        type: "ADD_PIN_RESET_INTERACTION"
-    });
+
+
+    chrome.runtime.sendMessage(
+        CRM_ID, // Extension ID
+        {
+            action: "ADD_PIN_RESET_INTERACTION",
+            comments: comments
+
+        }
+    );
+
+
+
 
 }
-const addPinUnlockInteraction = async () => {
+const addPinUnlockInteraction = async (comments: string) => {
     console.log("addPinUnlockInteraction");
 
-    chrome.runtime.sendMessage({
-        type: "ADD_PIN_UNLOCK_INTERACTION"
-    });
+
+    chrome.runtime.sendMessage(
+        CRM_ID, // Extension ID
+        {
+            action: "ADD_PIN_UNLOCK_INTERACTION",
+            comments: comments
+
+        }
+    );
+
+
+
 
 }
+
+
 
 const waitForTableToChange = (): Promise<void> => {
     return new Promise((resolve) => {
