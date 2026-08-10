@@ -77,7 +77,7 @@ const createCommonReversalDialog = () => {
             item.style.background = "white";
         };
 
-        item.onclick = () => {
+        item.onclick = async () => {
             console.log("Selected:", itemText);
 
             // Hide dropdown
@@ -85,8 +85,8 @@ const createCommonReversalDialog = () => {
 
             // Return button to normal
             button.textContent = "Common Stuff ▼";
-
-            specificItemClicked(itemText)
+            const txnId = await getTransactionId()
+            specificItemClicked(itemText, txnId)
         };
 
         dropdown.appendChild(item);
@@ -119,43 +119,43 @@ const createCommonReversalDialog = () => {
     return wrapper;
 }
 
-export const specificItemClicked = async (sr: string) => {
+export const specificItemClicked = async (sr: string, txnId: string) => {
     console.log("sr: " + sr);
     switch (sr) {
 
         case "Merchant REVERSAL": {
             await writeContentToClipBoard(sessionStorage.getItem("txnId")!)
 
-            initiateMerchantReversalJourney()
+            initiateMerchantReversalJourney(txnId)
             break
         }
         case "Sfc Merchant REVERSAL": {
             await writeContentToClipBoard(sessionStorage.getItem("txnId")!)
 
-            initiateSfcMerchantReversalJourney()
+            initiateSfcMerchantReversalJourney(txnId)
             break
         }
         case "KOPO KOPO": {
 
-            initiateKopoKopoMerchantReversalJourney()
+            initiateKopoKopoMerchantReversalJourney(txnId)
             break
         }
         case "Bank Merchant REVERSAL": {
             await writeContentToClipBoard(sessionStorage.getItem("txnId")!)
 
-            initiateBankMerchantReversalJourney()
+            initiateBankMerchantReversalJourney(txnId)
             break
         }
         case "P2P REVERSAL": {
             await writeContentToClipBoard(sessionStorage.getItem("txnId")!)
 
-            initiateP2pReversalJourney()
+            initiateP2pReversalJourney(txnId)
             break
         }
         case "POCHI REVERSAL": {
             await writeContentToClipBoard(sessionStorage.getItem("txnId")!)
 
-            initiatePochiReversalJourney()
+            initiatePochiReversalJourney(txnId)
             break
         }
         case "PAYBILL REVERSAL": {
@@ -165,46 +165,53 @@ export const specificItemClicked = async (sr: string) => {
     }
 }
 
-const initiateMerchantReversalJourney = async () => {
+
+export const initiateMerchantReversalJourney = async (txnId: string) => {
     console.log("initiateMerchantReversalJourney");
-    chrome.runtime.sendMessage({
-        type: "ADD_MERCHANT_REVERSAL_INTERACTION",
-        txnId: sessionStorage.getItem("txnId")!
-    });
-
+    chrome.runtime.sendMessage(
+        CRM_ID, // Extension ID
+        {
+            action: "ADD_MERCHANT_REVERSAL_INTERACTION",
+            txnId: txnId
+        }
+    );
 }
-const initiateSfcMerchantReversalJourney = async () => {
+export const initiateSfcMerchantReversalJourney = async (txnId: string) => {
     console.log("initiateSfcMerchantReversalJourney");
-    chrome.runtime.sendMessage({
-        type: "ADD_SFC_MERCHANT_REVERSAL_INTERACTION",
-        txnId: sessionStorage.getItem("txnId")!
-    });
-
+    chrome.runtime.sendMessage(
+        CRM_ID, // Extension ID
+        {
+            action: "ADD_SFC_MERCHANT_REVERSAL_INTERACTION",
+            txnId: txnId
+        }
+    );
 }
-export const initiateKopoKopoMerchantReversalJourney = async () => {
+
+
+export const initiateKopoKopoMerchantReversalJourney = async (txnId: string) => {
     console.log("initiateKopoKopoMerchantReversalJourney");
     chrome.runtime.sendMessage(
         CRM_ID, // Extension ID
         {
             action: "ADD_KOPO_KOPO_MERCHANT_REVERSAL_INTERACTION",
             subType: "Kopokopo Reversal",
-            txnId: sessionStorage.getItem("txnId")!
-        },
-        (response) => {
-            console.log(response);
+            txnId: txnId
         }
     );
 
 
 }
-const initiateBankMerchantReversalJourney = async () => {
+export const initiateBankMerchantReversalJourney = async (txnId: string) => {
     console.log("initiateBankMerchantReversalJourney");
-    chrome.runtime.sendMessage({
-        type: "ADD_BANK_MERCHANT_REVERSAL_SR",
-        txnId: sessionStorage.getItem("txnId")!
-    });
-
+    chrome.runtime.sendMessage(
+        CRM_ID, // Extension ID
+        {
+            action: "ADD_BANK_MERCHANT_REVERSAL_SR",
+            txnId: txnId
+        }
+    );
 }
+
 const initiatePaybillReversalJourney = async () => {
     console.log("initiatePaybillReversalJourney2");
 
@@ -247,20 +254,30 @@ const initiatePaybillReversalJourney = async () => {
     });
 
 } */
-const initiateP2pReversalJourney = async () => {
+
+
+export const initiateP2pReversalJourney = async (txnId: string) => {
     console.log("initiateP2pReversalJourney");
-    chrome.runtime.sendMessage({
-        type: "ADD_P2P_REVERSAL_INTERACTION"
-    });
-
+    chrome.runtime.sendMessage(
+        CRM_ID, // Extension ID
+        {
+            action: "ADD_P2P_REVERSAL_INTERACTION",
+            txnId: txnId
+        }
+    );
 }
-const initiatePochiReversalJourney = async () => {
+
+export const initiatePochiReversalJourney = async (txnId: string) => {
     console.log("initiatePochiReversalJourney");
-    chrome.runtime.sendMessage({
-        type: "ADD_POCHI_REVERSAL_INTERACTION"
-    });
-
+    chrome.runtime.sendMessage(
+        CRM_ID, // Extension ID
+        {
+            action: "ADD_POCHI_REVERSAL_INTERACTION",
+            txnId: txnId
+        }
+    );
 }
+
 
 export const getTransactionId = async () => {
     console.log("getTransactionId");

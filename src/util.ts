@@ -1,8 +1,9 @@
-import { getTransactionId, initiateKopoKopoMerchantReversalJourney, specificItemClicked, writeContentToClipBoard } from "./CommonReversalsDialog"
+import { getTransactionId, initiateP2pReversalJourney, specificItemClicked, writeContentToClipBoard } from "./CommonReversalsDialog"
 import { showConfirmationDialogAndWaitForAnswer } from "./ConfirmationDialog"
+import { CRM_ID } from "./Constants"
 import { waitForElementToAppear } from "./DiySmsFlow"
 import { showMessageDialog } from "./MessageDialog"
-import { clearCustomElements, createSendOfficeNumberButton, injectPaybillButton } from "./PaybillButton"
+import { injectPaybillButton } from "./PaybillButton"
 import { waitForElementWithParagraphTextContentToAppear, waitForTransactionType } from "./util-crmsaf"
 
 export const injectSetListenerForGlobalElements = async () => {
@@ -63,15 +64,7 @@ const setListenersForGlobalElements = (callback: () => void) => {
 };
 
 
-const setClickListenerForReverseButton2 = async () => {
-    console.log("setClickListenerForReverseButton");
-    const selector = 'button'
-    const reverseButton = await waitForElementToAppearWithTextContentForever(selector, "Reverse") as HTMLButtonElement
-    reverseButton.onclick = () => {
-        reverseButtonClicked()
-    }
 
-}
 const setClickListenerForReverseButton = async () => {
     console.log("setClickListenerForReverseButton");
     const selector = 'button'
@@ -179,12 +172,11 @@ const reverseButtonClicked = async () => {
 
     switch (transactionType) {
         case "Customer Merchant Payment": {
-
-            reverseForMerchant()
+            reverseForMerchant(txnId)
             break
         }
         case "Send Money": {
-            reverseForSendMoney(reasonType)
+            reverseForSendMoney(reasonType, txnId)
 
             break
         }
@@ -196,7 +188,7 @@ const reverseButtonClicked = async () => {
     }
 
 }
-const reverseForSendMoney = async (reasonType: string) => {
+const reverseForSendMoney = async (reasonType: string, txnId: string) => {
     console.log("reverseForSendMoney: reasonType: " + reasonType);
 
     const selector = '#submitProcessTransaction'
@@ -205,13 +197,13 @@ const reverseForSendMoney = async (reasonType: string) => {
 
     if (reasonType.startsWith("Customer Transfer")) {
         submitButton.onclick = () => {
-            submitForSendMoney()
+            submitForSendMoney(txnId)
 
         }
 
     } else if (reasonType.startsWith("Customer Send to Micro SME Business")) {
         submitButton.onclick = () => {
-            submitForSendMoneyMicroSmeBusiness()
+            submitForSendMoneyMicroSmeBusiness(txnId)
         }
     }
 
@@ -221,7 +213,7 @@ const reverseForSendMoney = async (reasonType: string) => {
 }
 
 
-const submitForSendMoney = async () => {
+const submitForSendMoney = async (txnId: string) => {
     console.log("submitForSendMoney");
 
 
@@ -231,7 +223,7 @@ Do you want to add Interaction ?
 `
     const yes = await showConfirmationDialogAndWaitForAnswer(message, "yes")
     if (yes) {
-        await dismissDialogAndAddP2pReversalInteraction()
+        await dismissDialogAndAddP2pReversalInteraction(txnId)
     }
 
 
@@ -251,24 +243,24 @@ const waitInsufficientFundsDialog = async () => {
 
 
 }
-const dismissDialogAndAddP2pReversalInteraction = async () => {
+const dismissDialogAndAddP2pReversalInteraction = async (txnId: string) => {
     console.log("waitApprovedByAnotherOperator");
     //click confirm dialog
     await dismissApprovedByAnotherOperatorDialog()
 
-    await specificItemClicked("P2P REVERSAL")
+    await specificItemClicked("P2P REVERSAL", txnId)
 
 
 }
-const dismissDialogAndAddPochiReversalInteraction = async () => {
+const dismissDialogAndAddPochiReversalInteraction = async (txnId: string) => {
     //click confirm dialog
     await dismissApprovedByAnotherOperatorDialog()
 
-    await specificItemClicked("POCHI REVERSAL")
+    await specificItemClicked("POCHI REVERSAL", txnId)
 
 
 }
-const submitForSendMoneyMicroSmeBusiness = async () => {
+const submitForSendMoneyMicroSmeBusiness = async (txnId: string) => {
     console.log("submitForSendMoney");
 
     const message =
@@ -277,14 +269,14 @@ Do you want to add Interaction ?
 `
     const yes = await showConfirmationDialogAndWaitForAnswer(message, "yes")
     if (yes) {
-        await dismissDialogAndAddPochiReversalInteraction()
+        await dismissDialogAndAddPochiReversalInteraction(txnId)
     }
 
 
 
 
 }
-const submitForMerchantPayment = async () => {
+const submitForMerchantPayment = async (txnId: string) => {
     console.log("submitForMerchantPayment");
 
 
@@ -307,7 +299,7 @@ const submitForMerchantPayment = async () => {
 
     switch (topOrgName) {
         case "SFC-Lipa na Mpesa Business Till Head office 17": {
-            reverseForMerchantSfc()
+            reverseForMerchantSfc(txnId)
             break;
         }
         case "fe": {
@@ -325,7 +317,7 @@ const submitForMerchantPayment = async () => {
     await dismissApprovedByAnotherOperatorDialog()
 
 
-    await specificItemClicked("P2P REVERSAL")
+    await specificItemClicked("P2P REVERSAL", txnId)
 
 
 
@@ -345,7 +337,7 @@ const dismissInsufficientFundsDialog = async () => {
     const submitButton = await waitForElementToAppearWithTextContent('button', "Confirm") as HTMLButtonElement
     submitButton.click()
 }
-const reverseForMerchant = async () => {
+const reverseForMerchant = async (txnId: string) => {
     console.log("reverseForMerchant");
     const title = await clickMoneyRecipient()
 
@@ -376,16 +368,16 @@ const reverseForMerchant = async () => {
 
 
     if (topOrgName.startsWith("SFC-Lipa na Mpesa Business Till Head office") || topOrgName.startsWith("SFC-Lipa na Mpesa Head office")) {
-        reverseForMerchantSfc()
+        reverseForMerchantSfc(txnId)
 
     } else if (topOrgName.startsWith("KOPO KOPO")) {
-        reverseForMerchantKopoKopo()
+        reverseForMerchantKopoKopo(txnId)
 
     }
     else {
 
         if (isTillBankAggregated(topOrgName)) {
-            reverseForMerchantBank(message, topOrgName)
+            reverseForMerchantBank(message, topOrgName, txnId)
 
         } else {
 
@@ -416,7 +408,7 @@ const isTillBankAggregated = (topOrgName: string) => {
     }
 
 }
-const reverseForMerchantBank = async (message: string, topOrgName: string) => {
+const reverseForMerchantBank = async (message: string, topOrgName: string, txnId: string) => {
     console.log("reverseForMerchantBank");
 
     const finalMessage =
@@ -425,39 +417,39 @@ const reverseForMerchantBank = async (message: string, topOrgName: string) => {
     `
     const send = await showConfirmationDialogAndWaitForAnswer(finalMessage, "yes")
     if (send) {
-        raiseSrForMerchantBankReversal()
+        raiseSrForMerchantBankReversal(txnId)
     }
 
 
 
 }
-const raiseSrForMerchantBankReversal = () => {
+const raiseSrForMerchantBankReversal = (txnId: string) => {
     console.log("raiseSrForMerchantBankReversal");
-    specificItemClicked("Bank Merchant REVERSAL")
+    specificItemClicked("Bank Merchant REVERSAL", txnId)
 }
-const reverseForMerchantSfc = async () => {
+const reverseForMerchantSfc = async (txnId: string) => {
     console.log("reverseForMerchantSfc");
     //set click listener for submit button
     const selector = '#submitProcessTransaction'
     const submitButton = await waitForElementToAppear(selector) as HTMLButtonElement
     submitButton.onclick = async () => {
 
-        await submitForSfcMerchantReversal()
+        await submitForSfcMerchantReversal(txnId)
     }
 
 }
-const reverseForMerchantKopoKopo = async () => {
+const reverseForMerchantKopoKopo = async (txnId: string) => {
     console.log("reverseForMerchantSfc");
     //set click listener for submit button
     const selector = '#submitProcessTransaction'
     const submitButton = await waitForElementToAppear(selector) as HTMLButtonElement
     submitButton.onclick = async () => {
 
-        await submitForKopoKopoMerchantReversal()
+        await submitForKopoKopoMerchantReversal(txnId)
     }
 
 }
-const submitForSfcMerchantReversal = async () => {
+const submitForSfcMerchantReversal = async (txnId: string) => {
     console.log("submitForSendMoney");
 
 
@@ -467,11 +459,11 @@ Do you want to add Interaction ?
 `
     const yes = await showConfirmationDialogAndWaitForAnswer(message, "yes")
     if (yes) {
-        await dismissDialogAndAddInteractionForSfcMerchantReversal()
+        await dismissDialogAndAddInteractionForSfcMerchantReversal(txnId)
     }
 
 }
-const submitForKopoKopoMerchantReversal = async () => {
+const submitForKopoKopoMerchantReversal = async (txnId: string) => {
     console.log("submitForKopoKopoMerchantReversal");
 
 
@@ -481,17 +473,17 @@ Do you want to add Interaction ?
 `
     const yes = await showConfirmationDialogAndWaitForAnswer(message, "yes")
     if (yes) {
-        await dismissDialogAndAddInteractionForKopoKopoMerchantReversal()
+        await dismissDialogAndAddInteractionForKopoKopoMerchantReversal(txnId)
     }
 
 }
-const dismissDialogAndAddInteractionForSfcMerchantReversal = async () => {
+const dismissDialogAndAddInteractionForSfcMerchantReversal = async (txnId: string) => {
     await dismissApprovedByAnotherOperatorDialog()
-    await specificItemClicked("Sfc Merchant REVERSAL")
+    await specificItemClicked("Sfc Merchant REVERSAL", txnId)
 }
-const dismissDialogAndAddInteractionForKopoKopoMerchantReversal = async () => {
+const dismissDialogAndAddInteractionForKopoKopoMerchantReversal = async (txnId: string) => {
     await dismissApprovedByAnotherOperatorDialog()
-    await specificItemClicked("KOPO KOPO")
+    await specificItemClicked("KOPO KOPO", txnId)
 }
 export const clickKycInfoTab = async () => {
     console.log("clickKycInfoTab");
@@ -661,7 +653,7 @@ const clickReviewTransaction = async () => {
 export const test = async () => {
 
 
-    specificItemClicked("KOPO KOPO")
+    initiateP2pReversalJourney("FETEFEFESE")
 
 
 }
@@ -757,8 +749,44 @@ const addMerchantReversalInteraction = async () => {
     });
 
 }
+
+const isThisOperatorPage = () => {
+    const el = Array.from(document.querySelectorAll("p"))
+        .find(el => el.textContent == "Organization Short Code");
+    if (el) return true
+
+    return false
+}
 const addPinResetInteraction = async () => {
     console.log("addPinResetInteraction");
+
+    const isOperatorPage = isThisOperatorPage()
+    if (isOperatorPage) {
+        addPinResetInteractionForTillOperator()
+    } else {
+        addPinResetInteractionForCustomer()
+    }
+
+}
+const addPinResetInteractionForTillOperator = async () => {
+    console.log("addPinResetInteractionForTillOperator");
+
+
+    chrome.runtime.sendMessage(
+        CRM_ID, // Extension ID
+        {
+            action: "ADD_PIN_RESET_INTERACTION_FOR_TILL_OPERATOR",
+            comments: await getContentInClipBoard()
+
+        }
+    );
+    //
+
+
+
+}
+const addPinResetInteractionForCustomer = async () => {
+    console.log("addPinResetInteractionForCustomer");
     chrome.runtime.sendMessage({
         type: "ADD_PIN_RESET_INTERACTION"
     });
