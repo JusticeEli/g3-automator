@@ -796,13 +796,18 @@ const addPinResetInteractionForCustomer = async (comments: string) => {
 
         }
     );
-
-
-
-
 }
 const addPinUnlockInteraction = async (comments: string) => {
     console.log("addPinUnlockInteraction");
+
+
+
+    const isOperatorPage = isThisOperatorPage()
+    if (isOperatorPage) {
+        addPinUnlockInteractionForTillOperator(comments)
+    } else {
+        addPinUnlockInteractionForCustomer(comments)
+    }
 
 
     chrome.runtime.sendMessage(
@@ -820,6 +825,36 @@ const addPinUnlockInteraction = async (comments: string) => {
 }
 
 
+const addPinUnlockInteractionForTillOperator = async (comments: string) => {
+    console.log("addPinUnlockInteractionForTillOperator");
+
+
+    chrome.runtime.sendMessage(
+        CRM_ID, // Extension ID
+        {
+            action: "ADD_PIN_UNLOCK_INTERACTION_FOR_TILL_OPERATOR",
+            comments: await getContentInClipBoard()
+
+        }
+    );
+    //
+
+
+
+}
+const addPinUnlockInteractionForCustomer = async (comments: string) => {
+    console.log("addPinUnlockInteractionForCustomer");
+
+
+    chrome.runtime.sendMessage(
+        CRM_ID, // Extension ID
+        {
+            action: "ADD_PIN_UNLOCK_INTERACTION",
+            comments: comments
+
+        }
+    );
+}
 
 const waitForTableToChange = (): Promise<void> => {
     return new Promise((resolve) => {
