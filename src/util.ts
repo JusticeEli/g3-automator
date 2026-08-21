@@ -652,7 +652,6 @@ const clickReviewTransaction = async () => {
 export const test = async () => {
 
 
-    initiateP2pReversalJourney("FETEFEFESE")
 
 
 }
@@ -748,7 +747,13 @@ const addMerchantReversalInteraction = async () => {
     });
 
 }
+const clickHomeSideBarLink = () => {
+    console.log("clickHomeSideBarLink");
+    const homeDiv = document.querySelector('div[id="home0"][index="home"]') as HTMLDivElement
+    const homeAnchor = homeDiv.querySelector('a') as HTMLAnchorElement
+    homeAnchor.click()
 
+}
 const isThisOperatorPage = () => {
     const el = Array.from(document.querySelectorAll("p"))
         .find(el => el.textContent == "Organization Short Code");
@@ -1114,3 +1119,20 @@ const waitForDOMToSettle = (timeout = 50): Promise<void> => {
     });
 };
 
+export const injectContentScriptMessageListener = async () => {
+    console.log("injectContentScriptMessageListener");
+
+    chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+        console.log("request");
+        console.log(JSON.stringify(request));
+
+
+        if (request.action == "CLICK_HOME_SIDE_BAR_LINK") {
+
+            clickHomeSideBarLink()
+
+        }
+
+
+    })
+}

@@ -1,11 +1,10 @@
 import { injectCommonReversalDialog } from "./CommonReversalsDialog";
-import { injectReverseButton } from "./ReverseButton";
 import { injectRocketButton } from "./RocketButton";
-import { injectSetListenerForGlobalElements, } from "./util";
+import { injectContentScriptMessageListener, injectSetListenerForGlobalElements, } from "./util";
 
 
 
-console.log("view360-automator extension loaded!");
+console.log("g3-automator extension loaded!");
 
 
 
@@ -25,6 +24,7 @@ window.onload = () => {
     injectRocketButton()
     injectSetListenerForGlobalElements()
     injectCommonReversalDialog()
+    injectContentScriptMessageListener()
 }
 
 
