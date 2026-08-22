@@ -815,14 +815,6 @@ const addPinUnlockInteraction = async (comments: string) => {
     }
 
 
-    chrome.runtime.sendMessage(
-        CRM_ID, // Extension ID
-        {
-            action: "ADD_PIN_UNLOCK_INTERACTION",
-            comments: comments
-
-        }
-    );
 
 
 
