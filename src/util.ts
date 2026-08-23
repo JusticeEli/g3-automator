@@ -651,7 +651,7 @@ const clickReviewTransaction = async () => {
 
 export const test = async () => {
 
-
+    clickSearchIdentityCustomerLink()
 
 
 }
@@ -752,6 +752,13 @@ const clickHomeSideBarLink = () => {
     const homeDiv = document.querySelector('div[id="home0"][index="home"]') as HTMLDivElement
     const homeAnchor = homeDiv.querySelector('a') as HTMLAnchorElement
     homeAnchor.click()
+
+}
+const clickSearchIdentityCustomerLink = () => {
+    console.log("clickSearchIdentityCustomerLink");
+    const customerDiv = document.querySelector('div[class="tags-view-item"][title="Customer"]') as HTMLDivElement
+    //  const homeAnchor = customerDiv.querySelector('a') as HTMLAnchorElement
+    customerDiv.click()
 
 }
 const isThisOperatorPage = () => {
@@ -1123,6 +1130,13 @@ export const injectContentScriptMessageListener = async () => {
 
             clickHomeSideBarLink()
 
+        } else if (request.action == "CLICK_SEARCH_IDENTITY_CUSTOMER_LINK") {
+
+            clickSearchIdentityCustomerLink()
+
+        }else{
+            console.log("injectContentScriptMessageListener -- else");
+            
         }
 
 
