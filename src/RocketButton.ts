@@ -9,7 +9,7 @@ export const injectRocketButton = () => {
 
     const button = document.createElement("button");
     button.id = "rocketButton";
-    button.innerText = "🚀 1.0.3";
+    button.innerText = "🚀 1.0.5";
 
     // Style it (floating button)
     button.style.position = "fixed";

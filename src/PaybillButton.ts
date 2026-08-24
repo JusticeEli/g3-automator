@@ -1,4 +1,4 @@
-import { specificItemClicked } from "./CommonReversalsDialog";
+import { getTransactionId, specificItemClicked } from "./CommonReversalsDialog";
 import { getTransactionType } from "./util";
 
 export const injectPaybillButton = async () => {
@@ -49,7 +49,8 @@ export const createSendOfficeNumberButton = () => {
 
 
     button.onclick = async () => {
-        await specificItemClicked("PAYBILL REVERSAL")
+        const txnId = await getTransactionId()
+        await specificItemClicked("PAYBILL REVERSAL",txnId)
 
     }
     document.body.appendChild(button)

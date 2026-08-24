@@ -159,7 +159,7 @@ export const specificItemClicked = async (sr: string, txnId: string) => {
             break
         }
         case "PAYBILL REVERSAL": {
-            initiatePaybillReversalJourney()
+            initiatePaybillReversalJourney(txnId)
             break
         }
     }
@@ -212,10 +212,9 @@ export const initiateBankMerchantReversalJourney = async (txnId: string) => {
     );
 }
 
-const initiatePaybillReversalJourney = async () => {
-    console.log("initiatePaybillReversalJourney2");
+const initiatePaybillReversalJourney = async (txnId: string) => {
+    console.log("initiatePaybillReversalJourney");
 
-    const trnId = await getTransactionId()
 
     const title = await clickMoneyRecipient()
 
@@ -236,25 +235,17 @@ const initiatePaybillReversalJourney = async () => {
 
 
     ////
-    chrome.runtime.sendMessage({
-        type: "ADD_PAYBILL_REVERSAL_INTERACTION",
-        txnId: trnId,
+    chrome.runtime.sendMessage(
+
+        CRM_ID, {
+        action: "ADD_PAYBILL_REVERSAL_INTERACTION",
+        txnId: txnId,
         officePhoneNumber: officePhoneNumber,
         paybillName: paybillName
-    });
+    }
+    );
 
 }
-/* const initiatePaybillReversalJourney = async () => {
-    console.log("initiatePaybillReversalJourney");
-    chrome.runtime.sendMessage({
-        type: "ADD_PAYBILL_REVERSAL_INTERACTION",
-        txnId: await getClipBoardContent(),
-        officePhoneNumber: await getOfficePhoneNumber(),
-        paybillName: await getPayBillName()
-    });
-
-} */
-
 
 export const initiateP2pReversalJourney = async (txnId: string) => {
     console.log("initiateP2pReversalJourney");
