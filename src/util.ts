@@ -213,16 +213,30 @@ const reverseForSendMoney = async (reasonType: string, txnId: string) => {
 
 
 const submitForSendMoney = async (txnId: string) => {
-    console.log("submitForSendMoney");
+    console.log("submitForSendMoney txnId: " + txnId);
 
 
-    const message =
-        `
+    const dailogText = await Promise.race([waitForApprovedByAnotherOperatorDialog(), waitForInsufficientFundsDialog()])
+
+    console.log("dialogText: " + dailogText);
+
+    if (dailogText == "APPROVED_BY_ANOTHER_OPERATOR") {
+        await dismissConfirmationDialog()
+
+
+
+        const message =
+            `
 Do you want to add Interaction ?
 `
-    const yes = await showConfirmationDialogAndWaitForAnswer(message, "yes")
-    if (yes) {
-        await dismissDialogAndAddP2pReversalInteraction(txnId)
+        const yes = await showConfirmationDialogAndWaitForAnswer(message, "yes")
+        if (yes) {
+            await specificItemClicked("P2P REVERSAL", txnId)
+
+        }
+
+    } else if (dailogText == "INSUFFICIENT_FUNDS_DIALOG") {
+
     }
 
 
@@ -231,17 +245,12 @@ Do you want to add Interaction ?
 
 
 
-}
-
-const waitInsufficientFundsDialog = async () => {
-    console.log("waitInsufficientFundsDialog");
-
-    //click confirm dialog
-    await dismissInsufficientFundsDialog()
 
 
 
 }
+
+
 const dismissDialogAndAddP2pReversalInteraction = async (txnId: string) => {
     console.log("waitApprovedByAnotherOperator");
     //click confirm dialog
@@ -335,6 +344,35 @@ const dismissInsufficientFundsDialog = async () => {
     await waitForElementToAppearWithTextContentIncludes('p', "insufficient")
     const submitButton = await waitForElementToAppearWithTextContent('button', "Confirm") as HTMLButtonElement
     submitButton.click()
+}
+
+const waitForApprovedByAnotherOperatorDialog = async () => {
+    console.log("waitForApprovedByAnotherOperatorDialog");
+    await waitForElementToAppearWithTextContent('p', "The request must be approved by another operator.")
+
+    return "APPROVED_BY_ANOTHER_OPERATOR"
+
+
+}
+
+
+const waitForInsufficientFundsDialog = async () => {
+    console.log("waitForInsufficientFundsDialog");
+    await waitForElementToAppearWithTextContentIncludes('p', "insufficient")
+
+
+    return "INSUFFICIENT_FUNDS_DIALOG"
+
+
+}
+
+const dismissConfirmationDialog = async () => {
+    console.log("dismissConfirmationDialog");
+
+    const submitButton = await waitForElementToAppearWithTextContent('button', "Confirm") as HTMLButtonElement
+    submitButton.click()
+
+
 }
 const reverseForMerchant = async (txnId: string) => {
     console.log("reverseForMerchant");
@@ -448,7 +486,7 @@ const reverseForMerchantKopoKopo = async (txnId: string) => {
     }
 
 }
-const submitForSfcMerchantReversal = async (txnId: string) => {
+const submitForSfcMerchantReversal__ = async (txnId: string) => {
     console.log("submitForSendMoney");
 
 
@@ -462,7 +500,37 @@ Do you want to add Interaction ?
     }
 
 }
-const submitForKopoKopoMerchantReversal = async (txnId: string) => {
+const submitForSfcMerchantReversal = async (txnId: string) => {
+    console.log("submitForSfcMerchantReversal");
+
+
+    const dailogText = await Promise.race([waitForApprovedByAnotherOperatorDialog(), waitForInsufficientFundsDialog()])
+
+    console.log("dialogText: " + dailogText);
+
+    if (dailogText == "APPROVED_BY_ANOTHER_OPERATOR") {
+        await dismissConfirmationDialog()
+
+
+
+        const message =
+            `
+Do you want to add Interaction ?
+`
+        const yes = await showConfirmationDialogAndWaitForAnswer(message, "yes")
+        if (yes) {
+            await specificItemClicked("Sfc Merchant REVERSAL", txnId)
+
+        }
+
+    } else if (dailogText == "INSUFFICIENT_FUNDS_DIALOG") {
+
+    }
+
+
+
+}
+const submitForKopoKopoMerchantReversal__ = async (txnId: string) => {
     console.log("submitForKopoKopoMerchantReversal");
 
 
@@ -473,6 +541,35 @@ Do you want to add Interaction ?
     const yes = await showConfirmationDialogAndWaitForAnswer(message, "yes")
     if (yes) {
         await dismissDialogAndAddInteractionForKopoKopoMerchantReversal(txnId)
+    }
+
+}
+const submitForKopoKopoMerchantReversal = async (txnId: string) => {
+    console.log("submitForKopoKopoMerchantReversal");
+
+
+
+    const dailogText = await Promise.race([waitForApprovedByAnotherOperatorDialog(), waitForInsufficientFundsDialog()])
+
+    console.log("dialogText: " + dailogText);
+
+    if (dailogText == "APPROVED_BY_ANOTHER_OPERATOR") {
+        await dismissConfirmationDialog()
+
+
+
+        const message =
+            `
+Do you want to add Interaction ?
+`
+        const yes = await showConfirmationDialogAndWaitForAnswer(message, "yes")
+        if (yes) {
+            await specificItemClicked("KOPO KOPO", txnId)
+
+        }
+
+    } else if (dailogText == "INSUFFICIENT_FUNDS_DIALOG") {
+
     }
 
 }
@@ -1134,9 +1231,9 @@ export const injectContentScriptMessageListener = async () => {
 
             clickSearchIdentityCustomerLink()
 
-        }else{
+        } else {
             console.log("injectContentScriptMessageListener -- else");
-            
+
         }
 
 
