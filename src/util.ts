@@ -236,31 +236,30 @@ const submitForSendMoney = async (txnId: string) => {
     console.log("submitForSendMoney txnId: " + txnId);
 
 
-    const dailogText = await Promise.race([waitForApprovedByAnotherOperatorDialog(), waitForInsufficientFundsDialog()])
-
-    console.log("dialogText: " + dailogText);
-    await dismissConfirmationDialog()
-
-
-    if (dailogText == "APPROVED_BY_ANOTHER_OPERATOR") {
+    //
 
 
 
-        const message =
-            `
-Do you want to add Interaction ?
-`
-        const yes = await showConfirmationDialogAndWaitForAnswer(message, "yes")
-        if (yes) {
-            await specificItemClicked("P2P REVERSAL", txnId)
+    await submitForReversal
+        (
+            {
+                txnId: txnId,
+                addReversalInteraction:
+                    async () => {
+                        await specificItemClicked("P2P REVERSAL", txnId)
 
-        }
+                    },
+                onInsufficientFunds:
+                    async () => {
 
-    } else if (dailogText == "INSUFFICIENT_FUNDS_DIALOG") {
+                        const amountSent = await getAmountSentToRecipient()
+                        await startPartialReversalJourneyForSendMoney(amountSent, txnId, "MMF Account For Customer")
 
-        const amountSent = await getAmountSentToRecipient()
-        await startPartialReversalJourneyForSendMoney(amountSent, txnId)
-    }
+                    }
+            }
+        )
+
+    //
 
 
 
@@ -320,12 +319,12 @@ const determineIfPartialReversalIsPossible = (amountSent: number, availableBalan
 
 
 }
-const startPartialReversalJourneyForSendMoney = async (amountSent: number, txnId: string) => {
+const startPartialReversalJourneyForSendMoney = async (amountSent: number, txnId: string, accountType: string) => {
     console.log("startPartialReversalJourneyForSendMoney");
     await clickSendMoneyRecipientLink()
     await waitForSendMoneyInfoPageToLoad()
 
-    const availableBalance = await getAvailableBalance()
+    const availableBalance = await getAvailableBalance(accountType)
 
     const isPartialReversalPossible = determineIfPartialReversalIsPossible(amountSent, availableBalance)
     console.log("isPartialReversalPossible: ", isPartialReversalPossible);
@@ -389,23 +388,24 @@ const clickSendMoneyRecipientLink = async () => {
 
 
 }
-const getAvailableBalance = async () => {
+const getAvailableBalance = async (accountType: string) => {
     console.log("getAvailableBalance");
 
 
 
-    const div = await waitForElementWithDivTextContentToAppear("MMF Account For Customer") as HTMLDivElement
-    const tr = div.closest("tr")!
-    const availableBalanceDiv = tr.querySelectorAll("td")[7]
+//  const div = await waitForElementWithDivTextContentToAppear("MMF Account For Customer") as HTMLDivElement
+const div = await waitForElementWithDivTextContentToAppear(accountType) as HTMLDivElement
+const tr = div.closest("tr")!
+const availableBalanceDiv = tr.querySelectorAll("td")[7]
 
-    const availableBalanceString = availableBalanceDiv.textContent!
-    console.log("availableBalanceString: " + availableBalanceString);
+const availableBalanceString = availableBalanceDiv.textContent!
+console.log("availableBalanceString: " + availableBalanceString);
 
-    const availableBalance = Math.floor(Number(availableBalanceString.replace(/,/g, "")));
+const availableBalance = Math.floor(Number(availableBalanceString.replace(/,/g, "")));
 
-    console.log("availableBalance: ", availableBalance);
+console.log("availableBalance: ", availableBalance);
 
-    return availableBalance
+return availableBalance
 
 }
 const waitForSendMoneyInfoPageToLoad = async () => {
@@ -454,7 +454,7 @@ const submitForSendMoneyMicroSmeBusiness = async (txnId: string) => {
     console.log("submitForPochiReversal");
 
 
-    //
+
 
     await submitForReversal
         (
@@ -467,12 +467,15 @@ const submitForSendMoneyMicroSmeBusiness = async (txnId: string) => {
                     },
                 onInsufficientFunds:
                     async () => {
+                        
+                        const amountSent = await getAmountSentToRecipient()
+                        await startPartialReversalJourneyForSendMoney(amountSent, txnId,"M-PESA Pochi Account")
 
-                    }
+            }
             }
         )
 
-    //
+
 
 
 
