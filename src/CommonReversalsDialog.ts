@@ -135,6 +135,15 @@ export const specificItemClicked = async (sr: string, txnId: string) => {
             initiateSfcMerchantReversalJourney(txnId)
             break
         }
+        case "SFC_MERCHANT_REVERSAL_INSUFFICIENT_FUNDS": {
+            initiateSfcMerchantReversalInsufficientFundsJourney(txnId)
+            break
+        } 
+         case "KOPO_KOPO_MERCHANT_REVERSAL_INSUFFICIENT_FUNDS": {
+            
+            initiateKopoKopoMerchantReversalInsufficientFundsJourney(txnId)
+            break
+        }
         case "KOPO KOPO": {
 
             initiateKopoKopoMerchantReversalJourney(txnId)
@@ -150,6 +159,11 @@ export const specificItemClicked = async (sr: string, txnId: string) => {
             await writeContentToClipBoard(sessionStorage.getItem("txnId")!)
 
             initiateP2pReversalJourney(txnId)
+            break
+        }
+        case "ADD_P2P_REVERSAL_INSUFFICIENT_FUNDS_INTERACTION": {
+
+            initiateP2pReversalInsufficientFundsJourney(txnId)
             break
         }
         case "POCHI REVERSAL": {
@@ -182,6 +196,28 @@ export const initiateSfcMerchantReversalJourney = async (txnId: string) => {
         CRM_ID, // Extension ID
         {
             action: "ADD_SFC_MERCHANT_REVERSAL_INTERACTION",
+            txnId: txnId
+        }
+    );
+}
+export const initiateSfcMerchantReversalInsufficientFundsJourney = async (txnId: string) => {
+    console.log("initiateSfcMerchantReversalInsufficientFundsJourney");
+
+    chrome.runtime.sendMessage(
+        CRM_ID, // Extension ID
+        {
+            action: "SFC_MERCHANT_REVERSAL_INSUFFICIENT_FUNDS",
+            txnId: txnId
+        }
+    );
+}
+export const initiateKopoKopoMerchantReversalInsufficientFundsJourney = async (txnId: string) => {
+    console.log("initiateKopoKopoMerchantReversalInsufficientFundsJourney");
+
+    chrome.runtime.sendMessage(
+        CRM_ID, // Extension ID
+        {
+            action: "KOPO_KOPO_MERCHANT_REVERSAL_INSUFFICIENT_FUNDS",
             txnId: txnId
         }
     );
@@ -253,6 +289,17 @@ export const initiateP2pReversalJourney = async (txnId: string) => {
         CRM_ID, // Extension ID
         {
             action: "ADD_P2P_REVERSAL_INTERACTION",
+            txnId: txnId
+        }
+    );
+}
+export const initiateP2pReversalInsufficientFundsJourney = async (txnId: string) => {
+
+    console.log("initiateP2pReversalInsufficientFundsJourney");
+    chrome.runtime.sendMessage(
+        CRM_ID, // Extension ID
+        {
+            action: "ADD_P2P_REVERSAL_INSUFFICIENT_FUNDS_INTERACTION",
             txnId: txnId
         }
     );
