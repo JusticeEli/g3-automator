@@ -366,6 +366,7 @@ const partialReversablePossible = async (amountToBeReversed: number, amountSent:
 }
 const pasteAmountToBeReversedOnPartialInput = async (amountToBeReversed: number, amountSent: number) => {
     console.log("pasteAmountToBeReversedOnPartialInput  amountToBeReversed: ", amountToBeReversed);
+    console.log("pasteAmountToBeReversedOnPartialInput  amountSent: ", amountSent);
 
     const reverseAmountInput = await waitForElementToAppear('input[id="reverseAmount"]') as HTMLInputElement
 
@@ -373,8 +374,8 @@ const pasteAmountToBeReversedOnPartialInput = async (amountToBeReversed: number,
 
     reverseAmountInput.click()
 
-    await waitForElementToAppearWithTextContent('input[id="reverseAmount"]', `${amountSent}`)
-    // await sleep(1000)
+    //await waitForElementToAppearWithTextContent('input[id="reverseAmount"]', `${amountSent}`)
+    await sleep(1000)
     reverseAmountInput.value = `${amountToBeReversed}`
 
 
