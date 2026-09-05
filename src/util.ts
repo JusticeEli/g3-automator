@@ -332,20 +332,25 @@ const startPartialReversalJourneyForSendMoney = async (amountSent: number, txnId
     if (isPartialReversalPossible) {
         partialReversablePossible(availableBalance, amountSent)
     } else {
-        partialReversableNotPossible(txnId)
+        partialReversableNotPossible(txnId,accountType)
     }
 
 }
 
-const partialReversableNotPossible = async (txnId: string) => {
+const partialReversableNotPossible = async (txnId: string, accountType: string) => {
     console.log("partialReversableNotPossible");
+
 
     const message =
         `Do you want to add Insufficient funds Interaction ?
     `
     const yes = await showConfirmationDialogAndWaitForAnswer(message, "yes")
     if (yes) {
-        await specificItemClicked("ADD_P2P_REVERSAL_INSUFFICIENT_FUNDS_INTERACTION", txnId)
+        if (accountType == "MMF Account For Customer")
+            await specificItemClicked("ADD_P2P_REVERSAL_INSUFFICIENT_FUNDS_INTERACTION", txnId)
+        else if (accountType == "M-PESA Pochi Account")
+            await specificItemClicked("ADD_POCHI_REVERSAL_INSUFFICIENT_FUNDS_INTERACTION", txnId)
+
 
     }
 
@@ -393,19 +398,19 @@ const getAvailableBalance = async (accountType: string) => {
 
 
 
-//  const div = await waitForElementWithDivTextContentToAppear("MMF Account For Customer") as HTMLDivElement
-const div = await waitForElementWithDivTextContentToAppear(accountType) as HTMLDivElement
-const tr = div.closest("tr")!
-const availableBalanceDiv = tr.querySelectorAll("td")[7]
+    //  const div = await waitForElementWithDivTextContentToAppear("MMF Account For Customer") as HTMLDivElement
+    const div = await waitForElementWithDivTextContentToAppear(accountType) as HTMLDivElement
+    const tr = div.closest("tr")!
+    const availableBalanceDiv = tr.querySelectorAll("td")[7]
 
-const availableBalanceString = availableBalanceDiv.textContent!
-console.log("availableBalanceString: " + availableBalanceString);
+    const availableBalanceString = availableBalanceDiv.textContent!
+    console.log("availableBalanceString: " + availableBalanceString);
 
-const availableBalance = Math.floor(Number(availableBalanceString.replace(/,/g, "")));
+    const availableBalance = Math.floor(Number(availableBalanceString.replace(/,/g, "")));
 
-console.log("availableBalance: ", availableBalance);
+    console.log("availableBalance: ", availableBalance);
 
-return availableBalance
+    return availableBalance
 
 }
 const waitForSendMoneyInfoPageToLoad = async () => {
@@ -451,7 +456,7 @@ Do you want to add Interaction ?
 
 
 const submitForSendMoneyMicroSmeBusiness = async (txnId: string) => {
-    console.log("submitForPochiReversal");
+    console.log("submitForSendMoneyMicroSmeBusiness");
 
 
 
@@ -467,11 +472,11 @@ const submitForSendMoneyMicroSmeBusiness = async (txnId: string) => {
                     },
                 onInsufficientFunds:
                     async () => {
-                        
-                        const amountSent = await getAmountSentToRecipient()
-                        await startPartialReversalJourneyForSendMoney(amountSent, txnId,"M-PESA Pochi Account")
 
-            }
+                        const amountSent = await getAmountSentToRecipient()
+                        await startPartialReversalJourneyForSendMoney(amountSent, txnId, "M-PESA Pochi Account")
+
+                    }
             }
         )
 
