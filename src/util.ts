@@ -332,7 +332,7 @@ const startPartialReversalJourneyForSendMoney = async (amountSent: number, txnId
     if (isPartialReversalPossible) {
         partialReversablePossible(availableBalance, amountSent)
     } else {
-        partialReversableNotPossible(txnId,accountType)
+        partialReversableNotPossible(txnId, accountType)
     }
 
 }
@@ -702,8 +702,17 @@ const submitForSfcMerchantReversal = async (txnId: string) => {
                     },
                 onInsufficientFunds:
                     async () => {
-                        await specificItemClicked("SFC_MERCHANT_REVERSAL_INSUFFICIENT_FUNDS", txnId)
 
+
+                        const message =
+                            `Do you want to add Insufficient funds SR ?
+                    `
+                        const yes = await showConfirmationDialogAndWaitForAnswer(message, "yes")
+                        if (yes) {
+
+                            await specificItemClicked("SFC_MERCHANT_REVERSAL_INSUFFICIENT_FUNDS", txnId)
+
+                        }
                     }
             }
         )
@@ -729,7 +738,17 @@ const submitForKopoKopoMerchantReversal = async (txnId: string) => {
                     },
                 onInsufficientFunds:
                     async () => {
-                        await specificItemClicked("KOPO_KOPO_MERCHANT_REVERSAL_INSUFFICIENT_FUNDS", txnId)
+
+                        const message =
+                            `Do you want to add Insufficient funds SR ?
+                `
+                        const yes = await showConfirmationDialogAndWaitForAnswer(message, "yes")
+                        if (yes) {
+
+                            await specificItemClicked("KOPO_KOPO_MERCHANT_REVERSAL_INSUFFICIENT_FUNDS", txnId)
+
+                        }
+
 
                     }
             }
