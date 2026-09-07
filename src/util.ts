@@ -194,19 +194,33 @@ const reverseButtonClicked = async () => {
 
             break
         }
-        case "withdrawl": {
-            reverseForWithdrawal(txnId)
+        case "Cash Out": {
+            reverseForWithdrawal(reasonType,txnId)
 
             break
         }
     }
 
 }
-const reverseForWithdrawal = async (txnId: string) => {
-    console.log("reverseForWithdrawal");
-    submitForWithdrawal(txnId)
+
+const reverseForWithdrawal = async (reasonType: string, txnId: string) => {
+    console.log("reverseForWithdrawal: reasonType: " + reasonType);
+
+    const selector = '#submitProcessTransaction'
+    const submitButton = await waitForElementToAppear(selector) as HTMLButtonElement
 
 
+    if (reasonType.startsWith("Customer Withdrawal at Agent Till")) {
+        submitButton.onclick = () => {
+            submitForWithdrawal(txnId)
+
+        }
+
+
+
+
+
+    }
 }
 const reverseForSendMoney = async (reasonType: string, txnId: string) => {
     console.log("reverseForSendMoney: reasonType: " + reasonType);
@@ -266,7 +280,7 @@ const submitForWithdrawal = async (txnId: string) => {
             }
         )
 
-    
+
 }
 const submitForDeposit = async (txnId: string) => {
     console.log("submitForDeposit txnId: " + txnId);
@@ -291,7 +305,7 @@ const submitForDeposit = async (txnId: string) => {
             }
         )
 
-    
+
 }
 const submitForSendMoney = async (txnId: string) => {
     console.log("submitForSendMoney txnId: " + txnId);
