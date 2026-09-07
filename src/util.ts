@@ -195,7 +195,12 @@ const reverseButtonClicked = async () => {
             break
         }
         case "Cash Out": {
-            reverseForWithdrawal(reasonType,txnId)
+            reverseForWithdrawal(reasonType, txnId)
+
+            break
+        }
+        case "Transaction Reversal": {
+            reverseForWithdrawal(reasonType, txnId)
 
             break
         }
@@ -215,10 +220,12 @@ const reverseForWithdrawal = async (reasonType: string, txnId: string) => {
             submitForWithdrawal(txnId)
 
         }
+    } else if (reasonType.startsWith("Withdrawal Reversal")) {
 
+        submitButton.onclick = () => {
+            submitForWithdrawal(txnId)
 
-
-
+        }
 
     }
 }
