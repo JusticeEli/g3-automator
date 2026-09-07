@@ -160,6 +160,16 @@ export const specificItemClicked = async (sr: string, txnId: string) => {
 
             initiateP2pReversalJourney(txnId)
             break
+        }  
+         case "WITHDRAW_REVERSAL_INTERACTION": {
+
+            initiateWithdrawReversalJourney(txnId)
+            break
+        }  
+         case "DEPOSIT_REVERSAL_INTERACTION": {
+
+            initiateDepositReversalJourney(txnId)
+            break
         }
         case "ADD_P2P_REVERSAL_INSUFFICIENT_FUNDS_INTERACTION": {
 
@@ -294,6 +304,28 @@ export const initiateP2pReversalJourney = async (txnId: string) => {
         CRM_ID, // Extension ID
         {
             action: "ADD_P2P_REVERSAL_INTERACTION",
+            txnId: txnId
+        }
+    );
+}
+export const initiateWithdrawReversalJourney = async (txnId: string) => {
+    console.log("initiateWithdrawReversalJourney");
+    
+    chrome.runtime.sendMessage(
+        CRM_ID, // Extension ID
+        {
+            action: "WITHDRAW_REVERSAL_INTERACTION",
+            txnId: txnId
+        }
+    );
+}
+export const initiateDepositReversalJourney = async (txnId: string) => {
+    console.log("initiateDepositReversalJourney");
+    
+    chrome.runtime.sendMessage(
+        CRM_ID, // Extension ID
+        {
+            action: "DEPOSIT_REVERSAL_INTERACTION",
             txnId: txnId
         }
     );

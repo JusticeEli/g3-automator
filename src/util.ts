@@ -194,7 +194,18 @@ const reverseButtonClicked = async () => {
 
             break
         }
+        case "withdrawl": {
+            reverseForWithdrawal(txnId)
+
+            break
+        }
     }
+
+}
+const reverseForWithdrawal = async (txnId: string) => {
+    console.log("reverseForWithdrawal");
+    submitForWithdrawal(txnId)
+
 
 }
 const reverseForSendMoney = async (reasonType: string, txnId: string) => {
@@ -232,6 +243,56 @@ const getAmountSentToRecipient = async () => {
     return amountSent
 }
 
+const submitForWithdrawal = async (txnId: string) => {
+    console.log("submitForWithdrawal txnId: " + txnId);
+
+
+
+
+    await submitForReversal
+        (
+            {
+                txnId: txnId,
+                addReversalInteraction:
+                    async () => {
+                        await specificItemClicked("WITHDRAW_REVERSAL_INTERACTION", txnId)
+
+                    },
+                onInsufficientFunds:
+                    async () => {
+
+
+                    }
+            }
+        )
+
+    
+}
+const submitForDeposit = async (txnId: string) => {
+    console.log("submitForDeposit txnId: " + txnId);
+
+
+
+
+    await submitForReversal
+        (
+            {
+                txnId: txnId,
+                addReversalInteraction:
+                    async () => {
+                        await specificItemClicked("DEPOSIT_REVERSAL_INTERACTION", txnId)
+
+                    },
+                onInsufficientFunds:
+                    async () => {
+
+
+                    }
+            }
+        )
+
+    
+}
 const submitForSendMoney = async (txnId: string) => {
     console.log("submitForSendMoney txnId: " + txnId);
 
@@ -928,7 +989,7 @@ const clickReviewTransaction = async () => {
 
 export const test = async () => {
 
-    clickSearchIdentityCustomerLink()
+    // clickSearchIdentityCustomerLink()
 
 
 }
