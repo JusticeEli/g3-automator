@@ -52,7 +52,7 @@ const setListenersForGlobalElements = (callback: () => void) => {
 
         timeout = window.setTimeout(() => {
             callback();
-        }, 2000); // wait 500ms after mutations settle
+        }, 500); // wait 500ms after mutations settle
     });
 
     observer.observe(document.body, {
