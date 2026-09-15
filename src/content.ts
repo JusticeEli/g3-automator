@@ -19,6 +19,8 @@ console.log("g3-automator extension loaded!");
 window.onload = () => {
     console.log("onLoad");
 
+    // disable logging
+    console.log = () => { };
 
 
     injectRocketButton()
